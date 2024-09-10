@@ -1,3 +1,4 @@
-export * from './model';
 export * from './Player';
-// export * from './player/PlayerView';
+export * from './Player.types';
+export * from './VideoView';
+export * from './VideoView.types';

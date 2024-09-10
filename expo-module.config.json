@@ -1,9 +1,9 @@
 {
   "platforms": ["ios", "tvos", "android", "web"],
   "ios": {
-    "modules": ["VlcPlayerModule"]
+    "modules": ["VideoPlayerModule"]
   },
   "android": {
-    "modules": ["ch.ifocusit.vlc.VlcPlayerModule"]
+    "modules": ["ch.ifocusit.andoid.player.VideoPlayerModule"]
   }
 }

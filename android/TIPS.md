@@ -69,4 +69,40 @@ options.add("RV32");
 options.add("-vv");
 ```
 
+```kotlin
 
+enum class ScaleType(val value: String) : Enumerable {
+    BEST_FIT("best_fit"),
+    FIT_SCREEN("fit_screen"),
+    FILL_SCREEN("fill_screen"),
+    RATIO_16_9("ratio_16_9"),
+    RATIO_16_10("ratio_16_10"),
+    RATIO_4_3("ratio_4_3"),
+    ORIGINAL("original"),
+}
+
+Prop("scale") { view: VlcPlayer, scale: ScaleType ->
+    when (scale) {
+        ScaleType.BEST_FIT -> view.player.videoScale =
+            MediaPlayer.ScaleType.SURFACE_BEST_FIT
+
+        ScaleType.FIT_SCREEN -> view.player.videoScale =
+            MediaPlayer.ScaleType.SURFACE_FIT_SCREEN
+
+        ScaleType.FILL_SCREEN -> view.player.videoScale =
+            MediaPlayer.ScaleType.SURFACE_FILL
+
+        ScaleType.RATIO_16_9 -> view.player.videoScale =
+            MediaPlayer.ScaleType.SURFACE_16_9
+
+        ScaleType.RATIO_16_10 -> view.player.videoScale =
+            MediaPlayer.ScaleType.SURFACE_16_10
+
+        ScaleType.RATIO_4_3 -> view.player.videoScale =
+            MediaPlayer.ScaleType.SURFACE_4_3
+
+        ScaleType.ORIGINAL -> view.player.videoScale =
+            MediaPlayer.ScaleType.SURFACE_ORIGINAL
+    }
+}
+```
