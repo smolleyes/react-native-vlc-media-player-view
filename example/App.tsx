@@ -1,33 +1,31 @@
-import { useEffect, useRef } from 'react';
-import { StyleSheet } from 'react-native';
-import { PlayerRef, VlcPlayer } from 'react-native-vlc-media-player-view';
+import { useEffect, useRef, useState } from 'react';
+import { Button, View } from 'react-native';
+import { ProgressInfo, useVideoPlayer, VideoInfo, VideoView } from 'react-native-vlc-media-player-view';
+
+const VIDEO_SOURCE = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
 
 export default function App() {
-  const playerRef = useRef<PlayerRef>(null);
+  const player = useVideoPlayer(undefined /* { initOptions: ['--no-audio', '--quiet'] } */, player => {
+    player.source = { uri: VIDEO_SOURCE };
+    player.play();
+  });
+  const playerRef = useRef<VideoView>(null);
+
+  const [videoInfo, setVideoInfo] = useState<VideoInfo>();
+  const [progress, setProgress] = useState<ProgressInfo>();
 
   useEffect(() => {
-    const player = playerRef.current;
-    if (player) {
-      player.seekTo(50 * 1000);
-    }
-  }, [playerRef.current]);
+    console.log('progress', progress);
+  }, [progress]);
 
   return (
-    <VlcPlayer
-      ref={playerRef}
-      source={{ uri: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4' }}
-      style={styles.container}
-    />
+    <View style={{ flex: 1, width: '100%', height: '100%', justifyContent: 'center', alignContent: 'center' }}>
+      <VideoView ref={playerRef} player={player} onLoaded={e => setVideoInfo(e.nativeEvent)} onProgress={e => setProgress(e.nativeEvent)} />
+      <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+        {videoInfo?.seekable && <Button title="<<" onPress={() => Math.max(0, (player.time = player.time + 15 * 1000))} />}
+        <Button title={player.isPlaying ? 'pause' : 'play'} onPress={() => player.togglePlay()} />
+        {videoInfo?.seekable && <Button title=">>" onPress={() => Math.min(videoInfo.duration, (player.time = player.time + 15 * 1000))} />}
+      </View>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'black',
-    alignItems: 'center',
-    justifyContent: 'center'
-  }
-});

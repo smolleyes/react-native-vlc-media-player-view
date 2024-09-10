@@ -6,15 +6,12 @@ module.exports = async (env, argv) => {
     {
       ...env,
       babel: {
-        dangerouslyAddModulePathsToTranspile: ['react-native-vlc-media-player-view'],
-      },
+        dangerouslyAddModulePathsToTranspile: ['react-native-vlc-media-player-view']
+      }
     },
     argv
   );
-  config.resolve.modules = [
-    path.resolve(__dirname, './node_modules'),
-    path.resolve(__dirname, '../node_modules'),
-  ];
+  config.resolve.modules = [path.resolve(__dirname, './node_modules'), path.resolve(__dirname, '../node_modules')];
 
   return config;
 };

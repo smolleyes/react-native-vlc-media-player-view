@@ -10,16 +10,13 @@ const config = getDefaultConfig(__dirname);
 config.resolver.blockList = [
   ...Array.from(config.resolver.blockList ?? []),
   new RegExp(path.resolve('..', 'node_modules', 'react')),
-  new RegExp(path.resolve('..', 'node_modules', 'react-native')),
+  new RegExp(path.resolve('..', 'node_modules', 'react-native'))
 ];
 
-config.resolver.nodeModulesPaths = [
-  path.resolve(__dirname, './node_modules'),
-  path.resolve(__dirname, '../node_modules'),
-];
+config.resolver.nodeModulesPaths = [path.resolve(__dirname, './node_modules'), path.resolve(__dirname, '../node_modules')];
 
 config.resolver.extraNodeModules = {
-  'react-native-vlc-media-player-view': '..',
+  'react-native-vlc-media-player-view': '..'
 };
 
 config.watchFolders = [path.resolve(__dirname, '..')];
@@ -27,8 +24,8 @@ config.watchFolders = [path.resolve(__dirname, '..')];
 config.transformer.getTransformOptions = async () => ({
   transform: {
     experimentalImportSupport: false,
-    inlineRequires: true,
-  },
+    inlineRequires: true
+  }
 });
 
 module.exports = config;

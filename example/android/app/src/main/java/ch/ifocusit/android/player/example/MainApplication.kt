@@ -1,4 +1,4 @@
-package ch.ifocusit.vlc.example
+package ch.ifocusit.android.player.example
 
 import android.app.Application
 import android.content.res.Configuration

@@ -302,7 +302,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "ch.ifocusit.vlc.example";
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.ifocusit.android.player.example";
 				PRODUCT_NAME = "reactnativevlcmediaplayerviewexample";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -329,7 +329,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "ch.ifocusit.vlc.example";
+				PRODUCT_BUNDLE_IDENTIFIER = "ch.ifocusit.android.player.example";
 				PRODUCT_NAME = "reactnativevlcmediaplayerviewexample";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";

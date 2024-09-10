@@ -109,9 +109,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'ch.ifocusit.vlc.example'
+    namespace 'ch.ifocusit.android.player.example'
     defaultConfig {
-        applicationId 'ch.ifocusit.vlc.example'
+        applicationId 'ch.ifocusit.android.player.example'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

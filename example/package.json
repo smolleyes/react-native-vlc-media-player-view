@@ -1,5 +1,5 @@
 {
-  "name": "react-native-vlc-media-player-view-example",
+  "name": "my-expo-module-example",
   "version": "1.0.0",
   "main": "expo/AppEntry.js",
   "scripts": {
@@ -9,20 +9,9 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@expo/vector-icons": "^14.0.2",
-    "@react-native-community/slider": "^4.5.2",
-    "@react-navigation/native": "^6.1.18",
     "expo": "~51.0.28",
-    "expo-brightness": "~12.0.1",
-    "expo-keep-awake": "~13.0.2",
-    "expo-router": "~3.5.18",
-    "expo-screen-orientation": "~7.0.5",
     "react": "18.2.0",
-    "react-native": "npm:react-native-tvos@latest",
-    "react-native-fullscreen-chz": "^4.0.13",
-    "react-native-gesture-handler": "~2.16.1",
-    "react-native-reanimated": "^3.10.11",
-    "react-native-volume-manager": "^1.10.0"
+    "react-native": "0.74.5"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
