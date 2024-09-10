@@ -4,6 +4,7 @@ import { VideoPlayer } from './Player.types';
 
 export type VideoSource = {
   uri?: string;
+  assetId?: number;
 };
 
 export type Track = {
