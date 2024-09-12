@@ -4,9 +4,12 @@ import { Track, VideoPlayer } from './Player.types';
 
 export type VideoViewProps = ViewProps & {
   player: VideoPlayer;
+  /**
+   * The player have to play the video before being able to received this event.
+   */
   onLoaded?: (event: { nativeEvent: VideoInfo }) => void;
   onProgress?: (event: { nativeEvent: ProgressInfo }) => void;
-  onPlaying?: (isPlaying: { nativeEvent: boolean }) => void;
+  onPaused?: (paused: { nativeEvent: { payload: boolean } }) => void;
   onEnded?: () => void;
   onError?: () => void;
 };

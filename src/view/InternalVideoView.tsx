@@ -1,10 +1,8 @@
-import { requireNativeViewManager } from 'expo-modules-core';
 import { forwardRef, useState } from 'react';
 
 import { StyleSheet, useWindowDimensions } from 'react-native';
+import { Player } from '../Player';
 import { VideoInfo, VideoViewProps } from '../VideoView.types';
-
-const RNVideoPlayerView = requireNativeViewManager('VideoPlayerModule');
 
 type InternalVideoViewProps = Omit<VideoViewProps, 'player'> & {
   player: number | null;
@@ -16,7 +14,7 @@ export const InternalVideoView = forwardRef<any, InternalVideoViewProps>(({ onLo
   const videoSize = calculateVideoDimensions(windowDimensions, videoInfo?.videoSize);
 
   return (
-    <RNVideoPlayerView
+    <Player
       onLoaded={(e: { nativeEvent: VideoInfo }) => {
         setVideoInfo(e.nativeEvent);
         onLoaded?.(e);

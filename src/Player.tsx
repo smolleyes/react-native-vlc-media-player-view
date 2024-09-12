@@ -1,7 +1,9 @@
-import { useReleasingSharedObject } from 'expo-modules-core';
+import { requireNativeViewManager, useReleasingSharedObject } from 'expo-modules-core';
 
 import { PlayerConfiguration, VideoPlayer } from './Player.types';
 import { VideoPlayerModule } from './VideoPlayerModule';
+
+export const Player = requireNativeViewManager('VideoPlayerModule');
 
 export function useVideoPlayer(config?: PlayerConfiguration, setup?: (player: VideoPlayer) => void): VideoPlayer {
   return useReleasingSharedObject(() => {

@@ -22,11 +22,11 @@ export declare class VideoPlayer extends SharedObject {
   /**
    * The selected audio track id.
    */
-  selectedAudioTrackId: number | null;
+  selectedAudioTrackId: string | null;
   /**
    * The selected text track id.
    */
-  selectedTextTrackId: number | null;
+  selectedTextTrackId: string | null;
   /**
    * The delay between the video and the audio in milliseconds.
    */

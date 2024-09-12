@@ -22,7 +22,7 @@ class VideoView(context: Context, appContext: AppContext) : ExpoView(context, ap
 
     internal val onLoaded by EventDispatcher<VideoInfo>()
     internal val onProgress by EventDispatcher<ProgressInfo>()
-    internal val onPlaying by EventDispatcher<Boolean>()
+    internal val onPaused by EventDispatcher<Boolean>()
     internal val onEnded by EventDispatcher<Unit>()
     private val onError by EventDispatcher<Unit>()
 
@@ -60,7 +60,7 @@ class VideoView(context: Context, appContext: AppContext) : ExpoView(context, ap
 
                     Event.Playing -> {
                         val playing = player.isPlaying
-                        onPlaying(playing)
+                        onPaused(!playing)
                         this.keepScreenOn = playing
                     }
 

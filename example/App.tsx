@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { Button, Text, View } from 'react-native';
 import { ProgressInfo, useVideoPlayer, VideoInfo, VideoView } from 'react-native-vlc-media-player-view';
 
-const VIDEO_SOURCE = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+const VIDEO_SOURCE = 'http://apsmart.in/movie/545077210277743/1593574628/116852.mkv';
 
 export default function App() {
   const player = useVideoPlayer(undefined /* { initOptions: ['--no-audio', '--quiet'] } */, player => {

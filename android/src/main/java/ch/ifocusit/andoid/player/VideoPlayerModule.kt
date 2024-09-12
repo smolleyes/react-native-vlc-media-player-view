@@ -53,7 +53,7 @@ class VideoPlayerModule : Module() {
         Name("VideoPlayerModule")
 
         View(VideoView::class) {
-            Events("onLoaded", "onProgress", "onPlaying", "onEnded", "onError")
+            Events("onLoaded", "onProgress", "onPaused", "onEnded", "onError")
 
             Prop("player") { view: VideoView, player: VlcPlayer ->
                 println("set player")
