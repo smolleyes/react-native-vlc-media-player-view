@@ -1,6 +1,6 @@
 import { forwardRef, useState } from 'react';
-
 import { StyleSheet, useWindowDimensions } from 'react-native';
+
 import { Player } from '../Player';
 import { VideoInfo, VideoViewProps } from '../VideoView.types';
 

@@ -1,4 +1,5 @@
 import { requireNativeModule } from 'expo-modules-core';
+
 import { VideoPlayer } from './Player.types';
 
 type VideoPlayerModuleProps = {
