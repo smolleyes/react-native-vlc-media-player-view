@@ -2,14 +2,18 @@ import { ViewProps } from 'react-native';
 
 import { Track, VideoPlayer } from './Player.types';
 
+export type OnLoadedEvent = { nativeEvent: VideoInfo };
+export type OnProgessEvent = { nativeEvent: ProgressInfo };
+export type OnPausedEvent = { nativeEvent: { payload: boolean } };
+
 export type VideoViewProps = ViewProps & {
   player: VideoPlayer;
   /**
    * The player have to play the video before being able to received this event.
    */
-  onLoaded?: (event: { nativeEvent: VideoInfo }) => void;
-  onProgress?: (event: { nativeEvent: ProgressInfo }) => void;
-  onPaused?: (paused: { nativeEvent: { payload: boolean } }) => void;
+  onLoaded?: (event: OnLoadedEvent) => void;
+  onProgress?: (event: OnProgessEvent) => void;
+  onPaused?: (paused: OnPausedEvent) => void;
   onEnded?: () => void;
   onError?: () => void;
 };

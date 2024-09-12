@@ -12,7 +12,7 @@ export class VideoView extends PureComponent<VideoViewProps> {
     const { player, ...props } = this.props;
     const playerId = getPlayerId(player);
 
-    return <InternalVideoView {...this.props} player={playerId} ref={this.nativeRef} {...props} />;
+    return <InternalVideoView {...this.props} player={playerId} playerObject={player} ref={this.nativeRef} {...props} />;
   }
 }
 

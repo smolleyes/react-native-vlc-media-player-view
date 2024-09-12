@@ -1,37 +1,45 @@
 import { forwardRef, useState } from 'react';
-import { StyleSheet, useWindowDimensions } from 'react-native';
+import { StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { Player } from '../Player';
+import { VideoPlayer } from '../Player.types';
 import { VideoInfo, VideoViewProps } from '../VideoView.types';
+import { Controls } from './Controls';
 
 type InternalVideoViewProps = Omit<VideoViewProps, 'player'> & {
   player: number | null;
+  playerObject: VideoPlayer;
 };
 
-export const InternalVideoView = forwardRef<any, InternalVideoViewProps>(({ onLoaded, style, ...rest }: InternalVideoViewProps, ref) => {
-  const [videoInfo, setVideoInfo] = useState<VideoInfo>();
-  const windowDimensions = useWindowDimensions();
-  const videoSize = calculateVideoDimensions(windowDimensions, videoInfo?.videoSize);
+export const InternalVideoView = forwardRef<any, InternalVideoViewProps>(
+  ({ onLoaded, style, playerObject: player, ...rest }: InternalVideoViewProps, ref) => {
+    const [videoInfo, setVideoInfo] = useState<VideoInfo>();
+    const windowDimensions = useWindowDimensions();
+    const videoSize = calculateVideoDimensions(windowDimensions, videoInfo?.videoSize);
 
-  return (
-    <Player
-      onLoaded={(e: { nativeEvent: VideoInfo }) => {
-        setVideoInfo(e.nativeEvent);
-        onLoaded?.(e);
-      }}
-      style={videoSize}
-      ref={ref}
-      {...rest}
-    />
-  );
-});
+    return (
+      <View style={[styles.container, style]}>
+        <Player
+          onLoaded={(e: { nativeEvent: VideoInfo }) => {
+            setVideoInfo(e.nativeEvent);
+            onLoaded?.(e);
+          }}
+          style={videoSize}
+          ref={ref}
+          {...rest}
+        />
+        <Controls player={player} videoInfo={videoInfo} />
+      </View>
+    );
+  }
+);
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     width: '100%',
     height: '100%',
-    backgroundColor: 'black',
+    backgroundColor: '#121212',
     alignItems: 'center',
     justifyContent: 'center'
   }

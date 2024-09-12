@@ -146,6 +146,9 @@ class VideoPlayerModule : Module() {
                     if (ref.player.isPlaying) ref.player.pause() else ref.player.play()
                 }
             }
+            Function("stop") { ref: VlcPlayer ->
+                appContext.mainQueue.launch { ref.player.stop() }
+            }
 
             Property("audioDelay")
                 .get { ref: VlcPlayer ->

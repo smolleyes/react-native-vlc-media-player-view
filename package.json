@@ -31,7 +31,12 @@
   "author": "Julien Boz <julien.boz@gmail.com> (https://github.com/jboz)",
   "license": "MIT",
   "homepage": "https://github.com/jboz/react-native-vlc-media-player-view#readme",
-  "dependencies": {},
+  "dependencies": {
+    "expo-brightness": "^12.0.1",
+    "react-native-gesture-handler": "^2.19.0",
+    "react-native-reanimated": "^3.15.1",
+    "react-native-volume-manager": "^1.10.0"
+  },
   "devDependencies": {
     "@types/react": "^18.0.25",
     "expo-module-scripts": "^3.5.2",

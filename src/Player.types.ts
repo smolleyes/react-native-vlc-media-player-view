@@ -37,6 +37,7 @@ export declare class VideoPlayer extends SharedObject {
   play(source?: VideoSource): void;
   pause(): void;
   togglePlay(): void;
+  stop(): void;
 }
 
 export type VideoSource = {
