@@ -13,6 +13,7 @@ export default function App() {
 
   const [videoInfo, setVideoInfo] = useState<VideoInfo>();
   const [progress, setProgress] = useState<ProgressInfo>();
+  const [paused, setPaused] = useState<boolean>();
 
   const seekPad = 60;
 
@@ -26,6 +27,7 @@ export default function App() {
           setVideoInfo(e.nativeEvent);
         }}
         onProgress={e => setProgress(e.nativeEvent)}
+        onPaused={e => setPaused(e.nativeEvent.payload)}
       />
       <View
         style={{
@@ -43,7 +45,7 @@ export default function App() {
       >
         {videoInfo?.seekable && <Button title="<<" onPress={() => (player.time = player.time - seekPad * 1000)} />}
 
-        <Button title={player.isPlaying ? 'pause' : 'play'} onPress={() => player.togglePlay()} />
+        <Button title={paused ? 'play' : 'pause'} onPress={() => player.togglePlay()} />
 
         {videoInfo?.seekable && <Button title=">>" onPress={() => (player.time = player.time + seekPad * 1000)} />}
 

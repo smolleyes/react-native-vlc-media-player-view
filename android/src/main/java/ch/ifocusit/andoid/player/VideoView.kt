@@ -58,7 +58,7 @@ class VideoView(context: Context, appContext: AppContext) : ExpoView(context, ap
                         onEnded(Unit)
                     }
 
-                    Event.Playing -> {
+                    Event.Playing, Event.Paused -> {
                         val playing = player.isPlaying
                         onPaused(!playing)
                         this.keepScreenOn = playing
