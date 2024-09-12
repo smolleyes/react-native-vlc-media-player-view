@@ -1,16 +1,10 @@
 import { SharedObject } from 'expo-modules-core/build/ts-declarations/SharedObject';
 
-import { Track, VideoInfo, VideoSource } from './VideoView.types';
-
 export type PlayerConfiguration = {
   initOptions?: string[];
 };
 
-export type VideoPlayerEvents = {
-  onLoaded: (event: VideoInfo) => void;
-};
-
-export declare class VideoPlayer extends SharedObject<VideoPlayerEvents> {
+export declare class VideoPlayer extends SharedObject {
   source: VideoSource;
   paused: boolean;
   /**
@@ -25,8 +19,14 @@ export declare class VideoPlayer extends SharedObject<VideoPlayerEvents> {
   readonly isSeekable: boolean;
   readonly audioTracks: Track[];
   readonly textTracks: Track[];
-  selectedAudioTrack: Track;
-  selectedTextTrack: Track;
+  /**
+   * The selected audio track id.
+   */
+  selectedAudioTrackId: number | null;
+  /**
+   * The selected text track id.
+   */
+  selectedTextTrackId: number | null;
   /**
    * The delay between the video and the audio in milliseconds.
    */
@@ -38,3 +38,13 @@ export declare class VideoPlayer extends SharedObject<VideoPlayerEvents> {
   pause(): void;
   togglePlay(): void;
 }
+
+export type VideoSource = {
+  uri?: string;
+  assetId?: number;
+};
+
+export type Track = {
+  id: string;
+  name: string;
+};

@@ -21,7 +21,7 @@ export const InternalVideoView = forwardRef<any, InternalVideoViewProps>(({ onLo
         setVideoInfo(e.nativeEvent);
         onLoaded?.(e);
       }}
-      style={[style, videoSize]}
+      style={videoSize}
       ref={ref}
       {...rest}
     />

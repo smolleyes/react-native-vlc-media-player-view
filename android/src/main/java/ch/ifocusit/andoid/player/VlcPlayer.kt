@@ -4,9 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.net.Uri
-import android.view.ViewGroup.LayoutParams
 import ch.ifocusit.andoid.player.VideoPlayerModule.Dimensions
 import ch.ifocusit.andoid.player.VideoPlayerModule.PlayerConfiguration
+import ch.ifocusit.andoid.player.VideoPlayerModule.Track
 import ch.ifocusit.andoid.player.VideoPlayerModule.VideoInfo
 import ch.ifocusit.andoid.player.VideoPlayerModule.VideoSource
 import expo.modules.kotlin.AppContext
@@ -27,11 +27,10 @@ class VlcPlayer(
 ) : SharedObject(appContext) {
 
     private var libVLC: LibVLC =
-        if (config != null) LibVLC(context, config.initOptions) else LibVLC(context)
+        if (config?.initOptions != null) LibVLC(context, config.initOptions) else LibVLC(context)
 
     private val videoLayout = VLCVideoLayout(context).also {
         it.setBackgroundColor(Color.BLACK)
-        it.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
     }
 
     internal var player: MediaPlayer = MediaPlayer(libVLC).also {
@@ -64,7 +63,11 @@ class VlcPlayer(
             Dimensions(
                 videoTrack.width,
                 videoTrack.height
-            ), player.isSeekable, player.length
+            ),
+            player.isSeekable,
+            player.length,
+            (player.getTracks(IMedia.Track.Type.Audio) ?: arrayOf()).map { Track(it.id, it.name) },
+            (player.getTracks(IMedia.Track.Type.Text) ?: arrayOf()).map { Track(it.id, it.name) }
         )
     }
 
@@ -85,6 +88,9 @@ class VlcPlayer(
     fun play(source: VideoSource?) {
         if (source != null) {
             this.source = source
+        }
+        if (player.length == player.time) {
+            player.time = 0
         }
         player.play()
     }

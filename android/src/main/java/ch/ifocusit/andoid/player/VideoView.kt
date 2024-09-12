@@ -2,6 +2,7 @@ package ch.ifocusit.andoid.player
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import ch.ifocusit.andoid.player.VideoPlayerModule.ProgressInfo
@@ -30,7 +31,7 @@ class VideoView(context: Context, appContext: AppContext) : ExpoView(context, ap
             field = value
             if (field != null) {
                 field?.view = this
-                setlistener(field!!)
+                listenPlayerEvents(field!!)
             }
         }
 
@@ -38,7 +39,7 @@ class VideoView(context: Context, appContext: AppContext) : ExpoView(context, ap
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
     }
 
-    private fun setlistener(sharedObject: VlcPlayer) {
+    private fun listenPlayerEvents(sharedObject: VlcPlayer) {
         val player = sharedObject.player
         player.setEventListener { event ->
             run {

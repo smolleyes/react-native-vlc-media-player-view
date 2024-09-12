@@ -1,16 +1,6 @@
 import { ViewProps } from 'react-native';
 
-import { VideoPlayer } from './Player.types';
-
-export type VideoSource = {
-  uri?: string;
-  assetId?: number;
-};
-
-export type Track = {
-  id: number;
-  name: string;
-};
+import { Track, VideoPlayer } from './Player.types';
 
 export type VideoViewProps = ViewProps & {
   player: VideoPlayer;
@@ -28,6 +18,11 @@ export interface VideoInfo {
   };
   seekable: boolean;
   duration: number;
+  audioTracks: Track[];
+  textTracks: Track[];
 }
 
-export interface ProgressInfo {}
+export interface ProgressInfo {
+  time: number;
+  position: number;
+}

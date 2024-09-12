@@ -26,7 +26,9 @@ class VideoPlayerModule : Module() {
     data class VideoInfo(
         @Field val videoSize: Dimensions,
         @Field val seekable: Boolean,
-        @Field val duration: Long
+        @Field val duration: Long,
+        @Field val audioTracks: List<Track>,
+        @Field val textTracks: List<Track>
     ) : Record
 
     data class ProgressInfo(
@@ -73,12 +75,12 @@ class VideoPlayerModule : Module() {
                     }
                 }
 
-            Property("currentTime")
+            Property("isSeekable").get { ref: VlcPlayer -> ref.player.isSeekable }
+            Property("time")
                 .get { ref: VlcPlayer -> ref.player.time }
                 .set { ref: VlcPlayer, timeInMillis: Long ->
                     appContext.mainQueue.launch { ref.player.time = timeInMillis }
                 }
-
             Property("position")
                 .get { ref: VlcPlayer -> ref.player.position }
                 .set { ref: VlcPlayer, positionPercentage: Float ->
@@ -87,40 +89,43 @@ class VideoPlayerModule : Module() {
 
             Property("audioTracks")
                 .get { ref: VlcPlayer ->
-                    ref.player.getTracks(IMedia.Track.Type.Audio).map { Track(it.id, it.name) }
+                    (ref.player.getTracks(IMedia.Track.Type.Audio) ?: arrayOf()).map {
+                        Track(
+                            it.id,
+                            it.name
+                        )
+                    }
                 }
-
-            Property("selectedAudioTrack")
+            Property("selectedAudioTrackId")
                 .get { ref: VlcPlayer ->
-                    ref.player.getSelectedTrack(IMedia.Track.Type.Audio)
-                        .let { Track(it.id, it.name) }
+                    ref.player.getSelectedTrack(IMedia.Track.Type.Audio)?.id
                 }
-                .set { ref: VlcPlayer, trackId: String ->
+                .set { ref: VlcPlayer, id: String ->
                     appContext.mainQueue.launch {
-                        ref.player.selectTracks(IMedia.Track.Type.Audio, trackId)
+                        ref.player.selectTracks(IMedia.Track.Type.Audio, id)
                     }
                 }
 
-            Property("selectedTextTrack")
+            Property("selectedTextTrackId")
                 .get { ref: VlcPlayer ->
-                    ref.player.getSelectedTrack(IMedia.Track.Type.Text)
-                        .let { Track(it.id, it.name) }
+                    ref.player.getSelectedTrack(IMedia.Track.Type.Text)?.id
                 }
-                .set { ref: VlcPlayer, trackId: String ->
+                .set { ref: VlcPlayer, id: String ->
                     appContext.mainQueue.launch {
-                        ref.player.selectTracks(IMedia.Track.Type.Text, trackId)
+                        ref.player.selectTracks(IMedia.Track.Type.Text, id)
                     }
                 }
-
             Property("textTracks")
                 .get { ref: VlcPlayer ->
-                    ref.player.getTracks(IMedia.Track.Type.Text).map { Track(it.id, it.name) }
+                    (ref.player.getTracks(IMedia.Track.Type.Text) ?: arrayOf()).map {
+                        Track(
+                            it.id,
+                            it.name
+                        )
+                    }
                 }
 
-            Property("isSeekable").get { ref: VlcPlayer -> ref.player.isSeekable }
-
-            Property("isPlaying").get { ref: VlcPlayer -> ref.player.isPlaying }
-
+            Property("isPlaying").get { ref: VlcPlayer -> ref.player.isPlaying && ref.player.time != ref.player.length }
             Property("paused")
                 .get { ref: VlcPlayer ->
                     !ref.player.isPlaying
