@@ -2,9 +2,7 @@ package ch.ifocusit.andoid.player
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
 import ch.ifocusit.andoid.player.VideoPlayerModule.ProgressInfo
 import ch.ifocusit.andoid.player.VideoPlayerModule.VideoInfo
 import expo.modules.kotlin.AppContext
@@ -18,15 +16,19 @@ import org.videolan.libvlc.interfaces.IMedia
 class VideoView(context: Context, appContext: AppContext) : ExpoView(context, appContext),
     DefaultLifecycleObserver {
 
+    var willEnterPiP: Boolean = false
+    var isInFullscreen: Boolean = false
+        private set
+
     private var videoInfo: VideoInfo? = null
 
-    internal val onLoaded by EventDispatcher<VideoInfo>()
+    private val onLoaded by EventDispatcher<VideoInfo>()
     internal val onProgress by EventDispatcher<ProgressInfo>()
-    internal val onPaused by EventDispatcher<Boolean>()
-    internal val onEnded by EventDispatcher<Unit>()
+    private val onPaused by EventDispatcher<Boolean>()
+    private val onEnded by EventDispatcher<Unit>()
     private val onError by EventDispatcher<Unit>()
 
-    var player: VlcPlayer? = null
+    var videoPlayer: VlcPlayer? = null
         set(value) {
             field = value
             if (field != null) {
@@ -36,6 +38,7 @@ class VideoView(context: Context, appContext: AppContext) : ExpoView(context, ap
         }
 
     init {
+        VideoManager.registerVideoView(this)
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
     }
 
@@ -60,12 +63,15 @@ class VideoView(context: Context, appContext: AppContext) : ExpoView(context, ap
 
                     Event.Playing, Event.Paused, Event.Stopped -> {
                         val playing = player.isPlaying
-                        onPaused(!playing)
                         this.keepScreenOn = playing
+                        onPaused(!playing)
                     }
 
                     Event.TimeChanged -> {
                         onProgress(ProgressInfo(event.timeChanged, player.position))
+                    }
+                    Event.PositionChanged -> {
+                        onProgress(ProgressInfo(player.time, event.positionChanged))
                     }
 
                     Event.EncounteredError -> {
@@ -74,17 +80,5 @@ class VideoView(context: Context, appContext: AppContext) : ExpoView(context, ap
                 }
             }
         }
-    }
-
-    override fun onPause(owner: LifecycleOwner) {
-        player?.player?.pause()
-    }
-
-    override fun onStop(owner: LifecycleOwner) {
-        player?.player?.stop()
-    }
-
-    override fun onDestroy(owner: LifecycleOwner) {
-        player?.release()
     }
 }

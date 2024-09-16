@@ -1,21 +1,25 @@
+import { MaterialIcons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { GestureHandlerRootView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { VideoPlayer } from '../Player.types';
-import { VideoInfo } from '../VideoView.types';
 import { ControlsBar } from './controls/Bar';
 import useBrightness from './controls/components/useBrightness';
 import useVolume from './controls/components/useVolume';
 import { ControlsGestures } from './controls/Gestures';
+import { TracksView } from './controls/TracksView';
 import { VerticalControl } from './controls/VerticalControl';
+import { VideoPlayerEventsObserver } from './InternalVideoView';
 
 type ControlsProps = {
   player: VideoPlayer;
-  videoInfo?: VideoInfo;
+  playerObserver: VideoPlayerEventsObserver;
+  onBack?: () => void;
+  onPrevious?: () => void;
+  onNext?: () => void;
 };
 
-const SEEK_PAD = 15 * 1000;
-
-export const Controls = ({ player, videoInfo }: ControlsProps) => {
+export const Controls = ({ player, playerObserver, onBack, onPrevious, onNext }: ControlsProps) => {
   const [showControlsBar, setShowControlsBar] = useState(false);
 
   const [volume, setVolume] = useVolume();
@@ -24,13 +28,15 @@ export const Controls = ({ player, videoInfo }: ControlsProps) => {
   const [brightness, setBrightness] = useBrightness();
   const [showBrightness, setShowBrightness] = useState(false);
 
+  const [showTracks, setShowTracks] = useState(false);
+
   return (
-    <View style={styles.container}>
+    <GestureHandlerRootView style={styles.container}>
       <ControlsGestures
         onSingleTap={() => setShowControlsBar(!showControlsBar)}
         onDoubleTapCenter={() => player.togglePlay()}
-        onDoubleTapLeft={() => (player.time = player.time - SEEK_PAD)}
-        onDoubleTapRight={() => (player.time = player.time + SEEK_PAD)}
+        onDoubleTapLeft={() => (player.time = player.time - 10)}
+        onDoubleTapRight={() => (player.time = player.time + 30)}
         onVerticalSlideLeft={delta => {
           setShowControlsBar(false);
           setShowBrightness(true);
@@ -44,10 +50,50 @@ export const Controls = ({ player, videoInfo }: ControlsProps) => {
         }}
         onVerticalSlideRightEnd={() => setShowVolume(false)}
       />
-      {showVolume && <VerticalControl value={volume} title="volume" align="left" />}
-      {showBrightness && <VerticalControl value={brightness} title="luminosité" align="right" />}
-      {showControlsBar && <ControlsBar player={player} videoInfo={videoInfo} />}
-    </View>
+      {showVolume && (
+        <VerticalControl value={volume} title="volume" align="left" icon={<MaterialIcons name="volume-up" size={30} color="white" />} />
+      )}
+      {showBrightness && (
+        <VerticalControl
+          value={brightness}
+          title="luminosité"
+          align="right"
+          icon={<MaterialIcons name="brightness-medium" size={30} color="white" />}
+        />
+      )}
+      {showControlsBar && (
+        <ControlsBar
+          player={player}
+          playerObserver={playerObserver}
+          onBack={onBack}
+          onPrevious={onPrevious}
+          onNext={onNext}
+          leftButton={
+            (player.audioTracks.length > 0 || player.textTracks.length > 1) && (
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  setShowControlsBar(false);
+                  setShowTracks(true);
+                }}
+              >
+                <MaterialIcons name="subtitles" size={30} color="white" />
+              </TouchableWithoutFeedback>
+            )
+          }
+          rightButton={
+            <TouchableWithoutFeedback
+              onPress={() => {
+                setShowControlsBar(false);
+                setShowTracks(true);
+              }}
+            >
+              <MaterialIcons name="keyboard-control" size={30} color="white" />
+            </TouchableWithoutFeedback>
+          }
+        />
+      )}
+      {showTracks && <TracksView player={player} onClose={() => setShowTracks(false)} />}
+    </GestureHandlerRootView>
   );
 };
 
@@ -58,8 +104,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     flex: 1,
     width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center'
+    height: '100%'
   }
 });

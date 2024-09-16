@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { LayoutChangeEvent, StyleSheet, View } from 'react-native';
-import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS, useSharedValue } from 'react-native-reanimated';
 
 type ControlsProps = {
@@ -29,28 +29,28 @@ export const ControlsGestures = ({
   const [initialVerticalSlideLeftPositionY, setInitialVerticalSlideLeftPositionY] = useState(0);
   const [initialVerticalSlideRightPositionY, setInitialVerticalSlideRightPositionY] = useState(0);
 
-  const showControlHandler = () =>
+  const singleTapHandler = () =>
     Gesture.Tap()
       .numberOfTaps(1)
       .onEnd(() => runOnJS(onSingleTap)())
       .runOnJS(true);
 
-  const togglePlayHandler = Gesture.Tap()
+  const centerDoubleTapHandler = Gesture.Tap()
     .numberOfTaps(2)
     .onEnd(() => runOnJS(onDoubleTapCenter)())
     .runOnJS(true);
 
-  const backwardHandler = Gesture.Tap()
+  const leftDoubleTapHandler = Gesture.Tap()
     .numberOfTaps(2)
     .onEnd(() => runOnJS(onDoubleTapLeft)())
     .runOnJS(true);
 
-  const forwardHandler = Gesture.Tap()
+  const rightDoubleTapHandler = Gesture.Tap()
     .numberOfTaps(2)
     .onEnd(() => runOnJS(onDoubleTapRight)())
     .runOnJS(true);
 
-  const verticalSlideRight = Gesture.Pan()
+  const rightVerticalSlideHandler = Gesture.Pan()
     .onBegin(event => setInitialVerticalSlideLeftPositionY(event.y))
     .onChange(event => {
       runOnJS(onVerticalSlideRight)(calculatePanChangeDelta(event.y, initialVerticalSlideLeftPositionY, barHeight.value));
@@ -59,7 +59,7 @@ export const ControlsGestures = ({
     .onEnd(() => setTimeout(onVerticalSlideRightEnd, 1000))
     .runOnJS(true);
 
-  const brightnessHandler = Gesture.Pan()
+  const leftVerticalSlideHandler = Gesture.Pan()
     .onBegin(event => setInitialVerticalSlideRightPositionY(event.y))
     .onChange(event => {
       runOnJS(onVerticalSlideLeft)(calculatePanChangeDelta(event.y, initialVerticalSlideRightPositionY, barHeight.value));
@@ -71,27 +71,28 @@ export const ControlsGestures = ({
   const onBarLayout = (event: LayoutChangeEvent) => (barHeight.value = event.nativeEvent.layout.height);
 
   return (
-    <GestureHandlerRootView style={styles.container} onLayout={onBarLayout}>
-      <GestureDetector gesture={Gesture.Exclusive(backwardHandler, brightnessHandler, showControlHandler())}>
+    <View style={styles.container} onLayout={onBarLayout}>
+      <GestureDetector gesture={Gesture.Exclusive(leftDoubleTapHandler, leftVerticalSlideHandler, singleTapHandler())}>
         <View style={styles.part}></View>
       </GestureDetector>
-      <GestureDetector gesture={Gesture.Exclusive(togglePlayHandler, showControlHandler())}>
+      <GestureDetector gesture={Gesture.Exclusive(centerDoubleTapHandler, singleTapHandler())}>
         <View style={styles.part}></View>
       </GestureDetector>
-      <GestureDetector gesture={Gesture.Exclusive(forwardHandler, verticalSlideRight, showControlHandler())}>
+      <GestureDetector gesture={Gesture.Exclusive(rightDoubleTapHandler, rightVerticalSlideHandler, singleTapHandler())}>
         <View style={styles.part}></View>
       </GestureDetector>
-    </GestureHandlerRootView>
+    </View>
   );
 };
 
 export const calculatePanChangeDelta = (position: number, initialPosition: number, relativeHeight: number): number => {
   'worklet';
-  return (initialPosition - position) / (relativeHeight * 0.5);
+  return ((initialPosition - position) / relativeHeight) * 10;
 };
 
 const styles = StyleSheet.create({
   container: {
+    position: 'absolute',
     flex: 1,
     width: '100%',
     height: '100%',

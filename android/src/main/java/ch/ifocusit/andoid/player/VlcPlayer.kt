@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.net.Uri
 import ch.ifocusit.andoid.player.VideoPlayerModule.Dimensions
 import ch.ifocusit.andoid.player.VideoPlayerModule.PlayerConfiguration
+import ch.ifocusit.andoid.player.VideoPlayerModule.ProgressInfo
 import ch.ifocusit.andoid.player.VideoPlayerModule.Track
 import ch.ifocusit.andoid.player.VideoPlayerModule.VideoInfo
 import ch.ifocusit.andoid.player.VideoPlayerModule.VideoSource
@@ -20,11 +21,12 @@ import org.videolan.libvlc.util.VLCVideoLayout
 
 @Suppress("SameParameterValue")
 @SuppressLint("ViewConstructor")
-class VlcPlayer(
-    context: Context,
-    appContext: AppContext,
-    config: PlayerConfiguration?
-) : SharedObject(appContext) {
+class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfiguration?) :
+    SharedObject(appContext) {
+
+    var title: String? = null
+
+    val staysActiveInBackground = false
 
     private var libVLC: LibVLC =
         if (config?.initOptions != null) LibVLC(context, config.initOptions) else LibVLC(context)
@@ -60,6 +62,7 @@ class VlcPlayer(
     fun videoInfo(): VideoInfo? {
         val videoTrack = player.getSelectedTrack(IMedia.Track.Type.Video) as VideoTrack?
         return if (videoTrack == null) null else VideoInfo(
+            player.getSelectedTrack(IMedia.Track.Type.Video).let { Track(it.id, it.name) },
             Dimensions(
                 videoTrack.width,
                 videoTrack.height
@@ -94,5 +97,14 @@ class VlcPlayer(
         }
         player.play()
     }
-}
 
+    fun progressInfo(): ProgressInfo {
+        return ProgressInfo(player.time, player.position)
+    }
+
+    fun setTime(timeInMillis: Long) {
+        val capped = timeInMillis.coerceAtMost(player.length).coerceAtLeast(0)
+        player.time = capped
+        view?.onProgress?.invoke(ProgressInfo(capped, player.position))
+    }
+}

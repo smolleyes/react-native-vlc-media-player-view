@@ -1,10 +1,16 @@
 import { SharedObject } from 'expo-modules-core/build/ts-declarations/SharedObject';
+import { StyleProp, ViewStyle } from 'react-native';
 
 export type PlayerConfiguration = {
   initOptions?: string[];
 };
 
-export declare class VideoPlayer extends SharedObject {
+export type VideoPlayerEvents = {
+  paused(paused: boolean): void;
+  ended(): void;
+};
+
+export declare class VideoPlayer extends SharedObject<VideoPlayerEvents> {
   source: VideoSource;
   paused: boolean;
   /**
@@ -32,12 +38,49 @@ export declare class VideoPlayer extends SharedObject {
    */
   audioDelay: number;
 
+  readonly videoInfo: VideoInfo | null;
+  readonly progressInfo: ProgressInfo;
+  title: string | null;
+
   constructor(config?: PlayerConfiguration);
 
   play(source?: VideoSource): void;
   pause(): void;
   togglePlay(): void;
   stop(): void;
+}
+export type OnLoadedEvent = { nativeEvent: VideoInfo };
+export type OnProgessEvent = { nativeEvent: ProgressInfo };
+export type OnPausedEvent = { nativeEvent: { payload: boolean } };
+
+export type PlayerViewProps = {
+  style?: StyleProp<ViewStyle> | undefined;
+  player: VideoPlayer;
+  /**
+   * The player have to play the video before being able to received this event.
+   */
+  onLoaded?: (event: OnLoadedEvent) => void;
+  onProgress?: (event: OnProgessEvent) => void;
+  onPaused?: (paused: OnPausedEvent) => void;
+  onEnded?: () => void;
+  onError?: () => void;
+};
+
+export interface VideoInfo {
+  track?: Track;
+  videoSize: {
+    width: number;
+    height: number;
+  };
+  seekable: boolean;
+  duration: number;
+  audioTracks: Track[];
+  textTracks: Track[];
+}
+
+export interface ProgressInfo {
+  time: number;
+  position: number;
 }
 
 export type VideoSource = {

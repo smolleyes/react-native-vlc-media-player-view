@@ -24,6 +24,7 @@ class VideoPlayerModule : Module() {
     ) : Record
 
     data class VideoInfo(
+        @Field val track: Track,
         @Field val videoSize: Dimensions,
         @Field val seekable: Boolean,
         @Field val duration: Long,
@@ -56,8 +57,11 @@ class VideoPlayerModule : Module() {
             Events("onLoaded", "onProgress", "onPaused", "onEnded", "onError")
 
             Prop("player") { view: VideoView, player: VlcPlayer ->
-                println("set player")
-                view.player = player
+                view.videoPlayer = player
+            }
+
+            OnViewDestroys { view: VideoView ->
+                VideoManager.unregisterVideoView(view)
             }
         }
 
@@ -79,7 +83,7 @@ class VideoPlayerModule : Module() {
             Property("time")
                 .get { ref: VlcPlayer -> ref.player.time }
                 .set { ref: VlcPlayer, timeInMillis: Long ->
-                    appContext.mainQueue.launch { ref.player.time = timeInMillis }
+                    appContext.mainQueue.launch { ref.setTime(timeInMillis) }
                 }
             Property("position")
                 .get { ref: VlcPlayer -> ref.player.position }
@@ -118,18 +122,13 @@ class VideoPlayerModule : Module() {
             Property("textTracks")
                 .get { ref: VlcPlayer ->
                     (ref.player.getTracks(IMedia.Track.Type.Text) ?: arrayOf()).map {
-                        Track(
-                            it.id,
-                            it.name
-                        )
+                        Track(it.id, it.name)
                     }
                 }
 
             Property("isPlaying").get { ref: VlcPlayer -> ref.player.isPlaying && ref.player.time != ref.player.length }
             Property("paused")
-                .get { ref: VlcPlayer ->
-                    !ref.player.isPlaying
-                }
+                .get { ref: VlcPlayer -> !ref.player.isPlaying }
                 .set { ref: VlcPlayer, paused: Boolean ->
                     appContext.mainQueue.launch {
                         if (paused) ref.player.pause() else ref.player.play()
@@ -151,14 +150,34 @@ class VideoPlayerModule : Module() {
             }
 
             Property("audioDelay")
-                .get { ref: VlcPlayer ->
-                    ref.player.audioDelay
-                }
+                .get { ref: VlcPlayer -> ref.player.audioDelay }
                 .set { ref: VlcPlayer, delayInMillis: Long ->
                     appContext.mainQueue.launch {
                         ref.player.audioDelay = delayInMillis
                     }
                 }
+
+            Property("videoInfo")
+                .get { ref: VlcPlayer -> ref.videoInfo() }
+
+            Property("progressInfo")
+                .get { ref: VlcPlayer -> ref.progressInfo() }
+
+            Property("title")
+                .get { ref: VlcPlayer -> ref.title }
+                .set { ref: VlcPlayer, title: String ->
+                    appContext.mainQueue.launch {
+                        ref.title = title
+                    }
+                }
+        }
+
+        OnActivityEntersForeground {
+            VideoManager.onAppForegrounded()
+        }
+
+        OnActivityEntersBackground {
+            VideoManager.onAppBackgrounded()
         }
     }
 }

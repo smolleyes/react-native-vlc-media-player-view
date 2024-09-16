@@ -1,4 +1,4 @@
-export * from './Player';
+export { PlayerView, useVideoPlayer } from './Player';
 export * from './Player.types';
-export * from './VideoView';
+export { VideoView } from './VideoView';
 export * from './VideoView.types';
