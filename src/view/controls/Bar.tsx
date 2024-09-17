@@ -43,14 +43,14 @@ export const ControlsBar = ({ player, playerObserver, onBack, onPrevious, onNext
       <View style={styles.container}>
         <LinearGradient colors={['rgba(18, 18, 18, 0.8)', 'transparent']} style={styles.top}>
           {onBack && (
-            <TouchableWithoutFeedback onPress={onBack} style={{ paddingLeft: 5, paddingTop: 3 }}>
+            <TouchableWithoutFeedback onPress={onBack}>
               <MaterialIcons name="arrow-back" size={40} color="white" />
             </TouchableWithoutFeedback>
           )}
           {title && (
             <Text
               style={{
-                maxWidth: '80%',
+                flex: 1,
                 maxHeight: 110,
                 fontSize: 32,
                 fontWeight: 'bold',
@@ -133,8 +133,9 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
-    gap: 40
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    gap: 20
   },
   center: {
     flex: 1,

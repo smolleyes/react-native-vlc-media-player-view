@@ -1,9 +1,10 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { StyleSheet } from 'react-native';
-import { GestureHandlerRootView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import { StyleSheet, View } from 'react-native';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { VideoPlayer } from '../Player.types';
 import { ControlsBar } from './controls/Bar';
+import useBackHandler from './controls/components/useBackHandler';
 import useBrightness from './controls/components/useBrightness';
 import useVolume from './controls/components/useVolume';
 import { ControlsGestures } from './controls/Gestures';
@@ -30,8 +31,24 @@ export const Controls = ({ player, playerObserver, onBack, onPrevious, onNext }:
 
   const [showTracks, setShowTracks] = useState(false);
 
+  useBackHandler(() => {
+    if (showControlsBar) {
+      setShowControlsBar(false);
+      return true;
+    }
+    return;
+  });
+
+  // useTVEventHandler(event => {
+  //   if (!showControlsBar) {
+  //     event.eventType === 'left' && onBackward && onBackward();
+  //     event.eventType === 'right' && onForward && onForward();
+  //     (event.eventType === 'down' || event.eventType === 'up') && setShowControlsBar(true);
+  //   }
+  // });
+
   return (
-    <GestureHandlerRootView style={styles.container}>
+    <View style={styles.container}>
       <ControlsGestures
         onSingleTap={() => setShowControlsBar(!showControlsBar)}
         onDoubleTapCenter={() => player.togglePlay()}
@@ -93,7 +110,7 @@ export const Controls = ({ player, playerObserver, onBack, onPrevious, onNext }:
         />
       )}
       {showTracks && <TracksView player={player} onClose={() => setShowTracks(false)} />}
-    </GestureHandlerRootView>
+    </View>
   );
 };
 

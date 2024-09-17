@@ -95,6 +95,9 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
         if (player.length == player.time) {
             player.time = 0
         }
+        if (source?.time != null) {
+            player.time = source.time
+        }
         player.play()
     }
 

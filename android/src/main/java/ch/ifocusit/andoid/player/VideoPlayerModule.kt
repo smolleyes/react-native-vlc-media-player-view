@@ -16,6 +16,7 @@ class VideoPlayerModule : Module() {
 
     data class VideoSource(
         @Field val uri: String,
+        @Field val time: Long? = null,
     ) : Record
 
     data class Dimensions(

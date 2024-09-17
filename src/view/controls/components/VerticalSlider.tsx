@@ -3,7 +3,6 @@ import { LayoutChangeEvent, StyleProp, StyleSheet, Text, View, ViewStyle } from 
 import {
   Gesture,
   GestureDetector,
-  GestureHandlerRootView,
   GestureStateChangeEvent,
   GestureUpdateEvent,
   PanGestureChangeEventPayload,
@@ -76,7 +75,7 @@ const VerticalSlider = React.forwardRef<TSliderRef, TSliderProps>(
     const percent = () => Math.floor(((currentValue - min) / (max - min)) * 100);
 
     return (
-      <GestureHandlerRootView style={[styles.container, containerStyle]}>
+      <View style={[styles.container, containerStyle]}>
         {label && labelPosition === 'left' && <Text style={styles.label}>{label}</Text>}
         <GestureDetector gesture={panGesture}>
           <View style={styles.barContainer}>
@@ -90,7 +89,7 @@ const VerticalSlider = React.forwardRef<TSliderRef, TSliderProps>(
           </View>
         </GestureDetector>
         {label && labelPosition === 'right' && <Text style={styles.label}>{label}</Text>}
-      </GestureHandlerRootView>
+      </View>
     );
   }
 );

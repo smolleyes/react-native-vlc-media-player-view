@@ -86,6 +86,10 @@ export interface ProgressInfo {
 export type VideoSource = {
   uri?: string;
   assetId?: number;
+  /**
+   * The time in milliseconds at which playback should start.
+   */
+  time?: number;
 };
 
 export type Track = {
