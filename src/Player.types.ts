@@ -60,6 +60,7 @@ export type PlayerViewProps = {
    * The player have to play the video before being able to received this event.
    */
   onLoaded?: (event: OnLoadedEvent) => void;
+  onLoading?: () => void;
   onProgress?: (event: OnProgessEvent) => void;
   onPaused?: (paused: OnPausedEvent) => void;
   onEnded?: () => void;

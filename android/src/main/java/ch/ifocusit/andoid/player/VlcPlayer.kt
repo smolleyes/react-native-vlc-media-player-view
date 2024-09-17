@@ -24,6 +24,8 @@ import org.videolan.libvlc.util.VLCVideoLayout
 class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfiguration?) :
     SharedObject(appContext) {
 
+    internal var videoInfo: VideoInfo? = null
+    var loop = false
     var title: String? = null
 
     val staysActiveInBackground = false
@@ -42,9 +44,15 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
 
     var source: VideoSource? = null
         set(value) {
-            field = value
+            if (field == value) {
+                return
+            }
             if (field != null) {
                 player.stop()
+            }
+            field = value
+            videoInfo = null
+            if (field != null) {
                 val media = media(field!!.uri)
                 player.media = media
                 media.release()
@@ -53,25 +61,45 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
 
     var view: VideoView? = null
         set(value) {
+            videoInfo = null
             if (value != null) {
                 field = value
+                value.removeAllViews()
                 value.addView(videoLayout)
             }
         }
 
-    fun videoInfo(): VideoInfo? {
+    fun sourceChanged() = videoInfo == null && player.hasMedia()
+
+    fun loadVideoInfo(): VideoInfo? {
+        if (videoInfo != null) {
+            return videoInfo
+        }
         val videoTrack = player.getSelectedTrack(IMedia.Track.Type.Video) as VideoTrack?
-        return if (videoTrack == null) null else VideoInfo(
-            player.getSelectedTrack(IMedia.Track.Type.Video).let { Track(it.id, it.name) },
-            Dimensions(
-                videoTrack.width,
-                videoTrack.height
-            ),
-            player.isSeekable,
-            player.length,
-            (player.getTracks(IMedia.Track.Type.Audio) ?: arrayOf()).map { Track(it.id, it.name) },
-            (player.getTracks(IMedia.Track.Type.Text) ?: arrayOf()).map { Track(it.id, it.name) }
-        )
+        if (videoTrack != null) {
+            this.videoInfo = VideoInfo(
+                player.getSelectedTrack(IMedia.Track.Type.Video).let { Track(it.id, it.name) },
+                Dimensions(
+                    videoTrack.width,
+                    videoTrack.height
+                ),
+                player.isSeekable,
+                player.length,
+                (player.getTracks(IMedia.Track.Type.Audio) ?: arrayOf()).map {
+                    Track(
+                        it.id,
+                        it.name
+                    )
+                },
+                (player.getTracks(IMedia.Track.Type.Text) ?: arrayOf()).map {
+                    Track(
+                        it.id,
+                        it.name
+                    )
+                }
+            )
+        }
+        return videoInfo
     }
 
     private fun media(uri: String): Media {
@@ -82,6 +110,7 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
     }
 
     fun release() {
+        videoInfo = null
         player.stop()
         player.release()
         player.vlcVout.detachViews()
@@ -90,6 +119,7 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
 
     fun play(source: VideoSource?) {
         if (source != null) {
+            videoInfo = null
             this.source = source
         }
         if (player.length == player.time) {

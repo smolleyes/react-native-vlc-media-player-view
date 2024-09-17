@@ -55,7 +55,7 @@ class VideoPlayerModule : Module() {
         Name("VideoPlayerModule")
 
         View(VideoView::class) {
-            Events("onLoaded", "onProgress", "onPaused", "onEnded", "onError")
+            Events("onLoaded", "onLoading", "onProgress", "onPaused", "onEnded", "onError")
 
             Prop("player") { view: VideoView, player: VlcPlayer ->
                 view.videoPlayer = player
@@ -158,8 +158,11 @@ class VideoPlayerModule : Module() {
                     }
                 }
 
+            Property("isLoading")
+                .get { ref: VlcPlayer -> ref.sourceChanged() }
+
             Property("videoInfo")
-                .get { ref: VlcPlayer -> ref.videoInfo() }
+                .get { ref: VlcPlayer -> ref.videoInfo }
 
             Property("progressInfo")
                 .get { ref: VlcPlayer -> ref.progressInfo() }

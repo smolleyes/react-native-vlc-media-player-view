@@ -9,7 +9,6 @@ import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.viewevent.EventDispatcher
 import expo.modules.kotlin.views.ExpoView
 import org.videolan.libvlc.MediaPlayer.Event
-import org.videolan.libvlc.interfaces.IMedia
 
 @Suppress("SameParameterValue")
 @SuppressLint("ViewConstructor")
@@ -20,9 +19,8 @@ class VideoView(context: Context, appContext: AppContext) : ExpoView(context, ap
     var isInFullscreen: Boolean = false
         private set
 
-    private var videoInfo: VideoInfo? = null
-
     private val onLoaded by EventDispatcher<VideoInfo>()
+    private val onLoading by EventDispatcher<Unit>()
     internal val onProgress by EventDispatcher<ProgressInfo>()
     private val onPaused by EventDispatcher<Boolean>()
     private val onEnded by EventDispatcher<Unit>()
@@ -30,6 +28,9 @@ class VideoView(context: Context, appContext: AppContext) : ExpoView(context, ap
 
     var videoPlayer: VlcPlayer? = null
         set(value) {
+            if (field != null) {
+                field?.release()
+            }
             field = value
             if (field != null) {
                 field?.view = this
@@ -48,17 +49,22 @@ class VideoView(context: Context, appContext: AppContext) : ExpoView(context, ap
             run {
                 when (event.type) {
                     Event.Buffering -> {
-                        if (videoInfo == null) {
-                            videoInfo = sharedObject.videoInfo()
-                            val audioTracks = player.getTracks(IMedia.Track.Type.Audio)
-                            if (videoInfo != null && audioTracks?.isNotEmpty() == true) {
-                                onLoaded(videoInfo!!)
+                        if (sharedObject.sourceChanged()) {
+                            val videoInfo = sharedObject.loadVideoInfo()
+                            if (videoInfo != null) {
+                                onLoaded(videoInfo)
+                            } else {
+                                onLoading(Unit)
                             }
                         }
                     }
 
                     Event.EndReached -> {
                         onEnded(Unit)
+                        if (sharedObject.loop) {
+                            player.setTime(0, false)
+                            player.play()
+                        }
                     }
 
                     Event.Playing, Event.Paused, Event.Stopped -> {
@@ -70,6 +76,7 @@ class VideoView(context: Context, appContext: AppContext) : ExpoView(context, ap
                     Event.TimeChanged -> {
                         onProgress(ProgressInfo(event.timeChanged, player.position))
                     }
+
                     Event.PositionChanged -> {
                         onProgress(ProgressInfo(player.time, event.positionChanged))
                     }

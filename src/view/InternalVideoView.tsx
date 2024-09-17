@@ -1,5 +1,5 @@
 import { forwardRef, useState } from 'react';
-import { StyleSheet, useWindowDimensions, View } from 'react-native';
+import { LayoutRectangle, StyleSheet, View } from 'react-native';
 
 import { RNPlayer } from '../Player';
 import { OnLoadedEvent, OnPausedEvent, OnProgessEvent, ProgressInfo, VideoInfo, VideoPlayer } from '../Player.types';
@@ -11,6 +11,7 @@ export type InternalVideoViewProps = Omit<VideoViewProps, 'player'> & {
   playerObject: VideoPlayer;
 };
 
+type LoadingListener = () => void;
 type LoadedListener = (event: VideoInfo) => void;
 type PausedListener = (event: boolean) => void;
 type ProgressListener = (event: ProgressInfo) => void;
@@ -21,17 +22,21 @@ export type VideoPlayerEventsObserver = {
 };
 
 export type VideoPlayerListener = {
+  onLoading?: LoadingListener;
   onLoaded?: LoadedListener;
   onPaused?: PausedListener;
   onProgress?: ProgressListener;
 };
 
 export const InternalVideoView = forwardRef<any, InternalVideoViewProps>(
-  ({ style, onLoaded, onPaused, onProgress, playerObject, onBack, onPrevious, onNext, ...rest }: InternalVideoViewProps, ref) => {
+  (
+    { style, onLoading, onLoaded, onPaused, onProgress, playerObject, onBack, onPrevious, onNext, ...rest }: InternalVideoViewProps,
+    ref
+  ) => {
     const [videoInfo, setVideoInfo] = useState<VideoInfo>();
     const [progressInfo, setProgressInfo] = useState<ProgressInfo>();
-    const windowDimensions = useWindowDimensions();
-    const videoSize = calculateVideoDimensions(windowDimensions, videoInfo?.videoSize);
+    const [viewLayout, setViewLayout] = useState<LayoutRectangle>();
+    const videoSize = calculateVideoDimensions(viewLayout, videoInfo?.videoSize);
 
     const [listeners] = useState<VideoPlayerListener[]>([]);
 
@@ -53,10 +58,14 @@ export const InternalVideoView = forwardRef<any, InternalVideoViewProps>(
     };
 
     return (
-      <View style={[styles.container, style]}>
+      <View style={[styles.container, style]} onLayout={e => setViewLayout(e.nativeEvent.layout)}>
         <RNPlayer
           ref={ref}
           style={videoSize}
+          onLoading={() => {
+            listeners.forEach(listener => listener.onLoading?.());
+            onLoading?.();
+          }}
           onLoaded={(e: OnLoadedEvent) => {
             setVideoInfo(e.nativeEvent);
             listeners.forEach(listener => listener.onLoaded?.(e.nativeEvent));
@@ -95,24 +104,22 @@ interface ElementDimensions {
   height: number;
 }
 
-const calculateVideoDimensions = (
-  windowDimensions: ElementDimensions,
-  videoDimensions?: ElementDimensions | undefined
-): ElementDimensions => {
+const calculateVideoDimensions = (parentLayout?: LayoutRectangle, videoDimensions?: ElementDimensions | undefined): ElementDimensions => {
   'worklet';
   const aspectDimensions = videoDimensions?.height && videoDimensions?.width ? videoDimensions : { width: 16, height: 9 };
+  const parentDimensions = parentLayout || { width: 16, height: 9 };
 
-  const width = windowDimensions.height * (aspectDimensions.width / aspectDimensions.height);
-  const height = windowDimensions.width * (aspectDimensions.height / aspectDimensions.width);
+  const width = parentDimensions.height * (aspectDimensions.width / aspectDimensions.height);
+  const height = parentDimensions.width * (aspectDimensions.height / aspectDimensions.width);
 
   const dimensions =
-    height > windowDimensions.height
+    height > parentDimensions.height
       ? {
           width,
-          height: windowDimensions.height
+          height: parentDimensions.height
         }
       : {
-          width: windowDimensions.width,
+          width: parentDimensions.width,
           height
         };
 
