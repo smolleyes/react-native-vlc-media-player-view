@@ -30,16 +30,18 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
 
     val staysActiveInBackground = false
 
-    private var libVLC: LibVLC =
-        if (config?.initOptions != null) LibVLC(context, config.initOptions) else LibVLC(context)
+    private val libVLC: LibVLC =
+        if (config?.initOptions != null) LibVLC(context, config.initOptions)
+        else LibVLC(context)
 
     private val videoLayout = VLCVideoLayout(context).also {
         it.setBackgroundColor(Color.BLACK)
     }
 
-    internal var player: MediaPlayer = MediaPlayer(libVLC).also {
-        it.attachViews(videoLayout, null, true, true)
+    internal val player: MediaPlayer = MediaPlayer(libVLC).also {
+        it.attachViews(videoLayout, null, false, false)
         it.videoScale = MediaPlayer.ScaleType.SURFACE_FIT_SCREEN
+        it.setAudioOutput("audiotrack")
     }
 
     var source: VideoSource? = null
@@ -52,10 +54,13 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
             }
             field = value
             videoInfo = null
-            if (field != null) {
-                val media = media(field!!.uri)
+            if (value != null) {
+                val media = media(value.uri)
                 player.media = media
                 media.release()
+                if (value.time != null) {
+                    player.time = value.time
+                }
             }
         }
 
@@ -78,7 +83,7 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
         val videoTrack = player.getSelectedTrack(IMedia.Track.Type.Video) as VideoTrack?
         if (videoTrack != null) {
             this.videoInfo = VideoInfo(
-                player.getSelectedTrack(IMedia.Track.Type.Video).let { Track(it.id, it.name) },
+                videoTrack.let { Track(it.id, it.name) },
                 Dimensions(
                     videoTrack.width,
                     videoTrack.height

@@ -23,7 +23,14 @@ export const TracksView = ({ player, onClose }: TracksViewProps) => {
             <Text style={styles.separation}>Audio</Text>
             <ScrollView contentContainerStyle={styles.tracks}>
               {player.audioTracks.map((track, index) => (
-                <TouchableWithoutFeedback key={index} onPress={() => (player.selectedAudioTrackId = track.id)} style={styles.track}>
+                <TouchableWithoutFeedback
+                  key={index}
+                  onPress={() => {
+                    player.selectedAudioTrackId = track.id;
+                    onClose();
+                  }}
+                  style={styles.track}
+                >
                   <View style={styles.track}>
                     <View style={{ width: 24 }}>
                       {track.id === player.selectedAudioTrackId && <Ionicons name="checkmark-sharp" size={24} color="white" />}
@@ -43,7 +50,14 @@ export const TracksView = ({ player, onClose }: TracksViewProps) => {
             <Text style={styles.separation}>Sous-titre</Text>
             <ScrollView contentContainerStyle={styles.tracks}>
               {player.audioTracks.map((track, index) => (
-                <TouchableWithoutFeedback key={index} onPress={() => (player.selectedTextTrackId = track.id)} style={styles.track}>
+                <TouchableWithoutFeedback
+                  key={index}
+                  onPress={() => {
+                    player.selectedTextTrackId = track.id;
+                    onClose();
+                  }}
+                  style={styles.track}
+                >
                   <View style={styles.track}>
                     <View style={{ width: 24 }}>
                       {track.id === player.selectedTextTrackId && <Ionicons name="checkmark-sharp" size={24} color="white" />}

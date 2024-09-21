@@ -1,6 +1,7 @@
 package ch.ifocusit.andoid.player
 
 import android.app.Activity
+import android.util.Log
 import expo.modules.kotlin.exception.Exceptions
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition

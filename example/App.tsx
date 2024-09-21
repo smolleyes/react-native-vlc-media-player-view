@@ -7,6 +7,7 @@ import { useVideoPlayer, VideoView } from 'react-native-vlc-media-player-view';
 export default function App() {
   const player = useVideoPlayer({}, player => {
     player.title = 'Size is adapted to parent layout';
+    player.play({ uri: 'http://apsmart.in/movie/545077210277743/1593574628/137851.mkv', time: 5 * 60 * 1000 });
   });
 
   return (
@@ -27,7 +28,12 @@ export default function App() {
 
         <Button
           title="mkv"
-          onPress={() => player.play({ uri: 'https://sample-videos.com/video321/mkv/720/big_buck_bunny_720p_30mb.mkv' })}
+          onPress={() => player.play({ uri: 'http://apsmart.in/movie/545077210277743/1593574628/63585.mkv', time: 13 * 60 * 1000 })}
+        />
+
+        <Button
+          title="avi"
+          onPress={() => player.play({ uri: 'http://apsmart.in/movie/545077210277743/1593574628/63584.avi', time: 13 * 60 * 1000 })}
         />
 
         <Button

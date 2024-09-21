@@ -1,6 +1,6 @@
 {
   "name": "react-native-vlc-media-player-view",
-  "version": "0.2.14",
+  "version": "0.2.15",
   "description": "React Native VLC media player view with full controls",
   "main": "build/index.js",
   "types": "build/index.d.ts",
