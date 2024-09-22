@@ -1,7 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 import { VideoPlayer } from '../../Player.types';
 
 type TracksViewProps = {
@@ -11,12 +10,7 @@ type TracksViewProps = {
 
 export const TracksView = ({ player, onClose }: TracksViewProps) => {
   return (
-    <LinearGradient
-      colors={['transparent', 'rgba(18, 18, 18, 0.8)']}
-      start={{ x: 0.5, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={styles.background}
-    >
+    <View style={styles.background}>
       <View style={styles.container}>
         <View style={styles.parts}>
           <View style={styles.part}>
@@ -78,14 +72,13 @@ export const TracksView = ({ player, onClose }: TracksViewProps) => {
           <Text style={{ color: 'white', paddingHorizontal: 30, paddingVertical: 20, paddingTop: 0 }}>Fermer</Text>
         </TouchableWithoutFeedback>
       </View>
-    </LinearGradient>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   background: {
     position: 'absolute',
-    bottom: 0,
     flex: 1,
     width: '100%',
     height: '100%',

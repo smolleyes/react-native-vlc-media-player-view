@@ -2,7 +2,6 @@ package ch.ifocusit.andoid.player
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color
 import android.net.Uri
 import ch.ifocusit.andoid.player.VideoPlayerModule.Dimensions
 import ch.ifocusit.andoid.player.VideoPlayerModule.PlayerConfiguration
@@ -24,9 +23,8 @@ import org.videolan.libvlc.util.VLCVideoLayout
 class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfiguration?) :
     SharedObject(appContext) {
 
+    var view: VideoView? = null
     internal var videoInfo: VideoInfo? = null
-    var loop = false
-    var title: String? = null
 
     val staysActiveInBackground = false
 
@@ -34,9 +32,7 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
         if (config?.initOptions != null) LibVLC(context, config.initOptions)
         else LibVLC(context)
 
-    private val videoLayout = VLCVideoLayout(context).also {
-        it.setBackgroundColor(Color.BLACK)
-    }
+    internal val videoLayout = VLCVideoLayout(context)
 
     internal val player: MediaPlayer = MediaPlayer(libVLC).also {
         it.attachViews(videoLayout, null, false, false)
@@ -46,12 +42,9 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
 
     var source: VideoSource? = null
         set(value) {
-            if (field == value) {
-                return
-            }
-            if (field != null) {
-                player.stop()
-            }
+            if (player.isReleased) return
+            if (field == value) return
+            if (field != null) player.stop()
             field = value
             videoInfo = null
             if (value != null) {
@@ -61,16 +54,6 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
                 if (value.time != null) {
                     player.time = value.time
                 }
-            }
-        }
-
-    var view: VideoView? = null
-        set(value) {
-            videoInfo = null
-            if (value != null) {
-                field = value
-                value.removeAllViews()
-                value.addView(videoLayout)
             }
         }
 
@@ -84,24 +67,11 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
         if (videoTrack != null) {
             this.videoInfo = VideoInfo(
                 videoTrack.let { Track(it.id, it.name) },
-                Dimensions(
-                    videoTrack.width,
-                    videoTrack.height
-                ),
+                Dimensions(videoTrack.width, videoTrack.height),
                 player.isSeekable,
                 player.length,
-                (player.getTracks(IMedia.Track.Type.Audio) ?: arrayOf()).map {
-                    Track(
-                        it.id,
-                        it.name
-                    )
-                },
-                (player.getTracks(IMedia.Track.Type.Text) ?: arrayOf()).map {
-                    Track(
-                        it.id,
-                        it.name
-                    )
-                }
+                player.getTracks(IMedia.Track.Type.Audio).orEmpty().map { Track(it.id, it.name) },
+                player.getTracks(IMedia.Track.Type.Text).orEmpty().map { Track(it.id, it.name) }
             )
         }
         return videoInfo
@@ -109,20 +79,21 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
 
     private fun media(uri: String): Media {
         if (uri.startsWith("http")) {
-            return Media(libVLC, Uri.parse(uri))
+            return Media(libVLC, Uri.parse(uri.trim()))
         }
-        return Media(libVLC, uri)
+        return Media(libVLC, uri.trim())
     }
 
     fun release() {
-        videoInfo = null
-        player.stop()
+        if (player.isReleased) return
         player.release()
         player.vlcVout.detachViews()
         libVLC.release()
+        videoInfo = null
     }
 
-    fun play(source: VideoSource?) {
+    fun play(source: VideoSource? = null) {
+        if (player.isReleased) return
         if (source != null) {
             videoInfo = null
             this.source = source
@@ -141,8 +112,24 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
     }
 
     fun setTime(timeInMillis: Long) {
-        val capped = timeInMillis.coerceAtMost(player.length).coerceAtLeast(0)
-        player.time = capped
-        view?.onProgress?.invoke(ProgressInfo(capped, player.position))
+        val newValue = timeInMillis.coerceAtMost(player.length).coerceAtLeast(0)
+        player.time = newValue
+        view?.onProgress?.invoke(ProgressInfo(newValue, player.position))
+    }
+
+    fun setPosition(position: Float, fastSeeking: Boolean) {
+        val newValue = (position.coerceAtMost(1f).coerceAtLeast(0f))
+        player.setPosition(newValue, fastSeeking)
+        view?.onProgress?.invoke(ProgressInfo(player.time, newValue))
+    }
+
+    fun pause() {
+        if (player.isReleased) return
+        player.pause()
+    }
+
+    fun stop() {
+        if (player.isReleased) return
+        player.stop()
     }
 }

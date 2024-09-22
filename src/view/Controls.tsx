@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { VideoPlayer } from '../Player.types';
+import { AudioDelayView } from './controls/AudioDelayView';
 import { ControlsBar } from './controls/Bar';
 import useBackHandler from './controls/components/useBackHandler';
 import useBrightness from './controls/components/useBrightness';
@@ -32,6 +33,7 @@ export const Controls = ({ player, playerObserver, onBack, onPrevious, onNext }:
   const [showBrightness, setShowBrightness] = useState(false);
 
   const [showTracks, setShowTracks] = useState(false);
+  const [showAudioDelay, setShowAudioDelay] = useState(false);
 
   useBackHandler(() => {
     if (showControlsBar) {
@@ -61,6 +63,14 @@ export const Controls = ({ player, playerObserver, onBack, onPrevious, onNext }:
     };
   }, []);
 
+  const backward = () => {
+    player.time = player.time - 10 * 1000;
+  };
+
+  const forward = () => {
+    player.time = player.time + 30 * 1000;
+  };
+
   return (
     <View style={styles.container}>
       {(loading && (
@@ -78,10 +88,15 @@ export const Controls = ({ player, playerObserver, onBack, onPrevious, onNext }:
       )) || (
         <>
           <ControlsGestures
-            onSingleTap={() => setShowControlsBar(!showControlsBar)}
+            onSingleTap={() => {
+              if (!showTracks) {
+                setShowControlsBar(!showControlsBar);
+              }
+              setShowTracks(false);
+            }}
             onDoubleTapCenter={() => player.togglePlay()}
-            onDoubleTapLeft={() => (player.time = player.time - 10)}
-            onDoubleTapRight={() => (player.time = player.time + 30)}
+            onDoubleTapLeft={backward}
+            onDoubleTapRight={forward}
             onVerticalSlideLeft={delta => {
               setShowControlsBar(false);
               setShowBrightness(true);
@@ -114,10 +129,13 @@ export const Controls = ({ player, playerObserver, onBack, onPrevious, onNext }:
               onBack={onBack}
               onPrevious={onPrevious}
               onNext={onNext}
+              onBackward={backward}
+              onForward={forward}
               leftButton={
                 (player.audioTracks.length > 0 || player.textTracks.length > 1) && (
                   <TouchableWithoutFeedback
                     onPress={() => {
+                      setShowAudioDelay(false);
                       setShowControlsBar(false);
                       setShowTracks(true);
                     }}
@@ -136,9 +154,31 @@ export const Controls = ({ player, playerObserver, onBack, onPrevious, onNext }:
                   <MaterialIcons name="keyboard-control" size={30} color="white" />
                 </TouchableWithoutFeedback>
               }
+              centerLeftButton={
+                !showAudioDelay && (
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      setShowAudioDelay(true);
+                    }}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 10,
+                      borderRadius: 50,
+                      backgroundColor: '#121212',
+                      paddingVertical: 5,
+                      paddingHorizontal: 10
+                    }}
+                  >
+                    <MaterialIcons name="volume-up" size={25} color="white" />
+                    <Text style={{ color: 'white', fontSize: 16, fontWeight: '300' }}>{player.audioDelay} ms</Text>
+                  </TouchableWithoutFeedback>
+                )
+              }
             />
           )}
           {showTracks && <TracksView player={player} onClose={() => setShowTracks(false)} />}
+          {showAudioDelay && <AudioDelayView player={player} onClose={() => setShowAudioDelay(false)} />}
         </>
       )}
     </View>

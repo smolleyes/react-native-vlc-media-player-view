@@ -1,7 +1,6 @@
 package ch.ifocusit.andoid.player
 
 import android.app.Activity
-import android.util.Log
 import expo.modules.kotlin.exception.Exceptions
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
@@ -46,7 +45,13 @@ class VideoPlayerModule : Module() {
 
     data class Position(
         @Field val position: Float,
-        @Field val fastSeeking: Boolean
+        @Field val fastSeeking: Boolean = false
+    ) : Record
+
+    data class Chapter(
+        @Field val timeOffset: Long,
+        @Field val duration: Long,
+        @Field val name: String
     ) : Record
 
     private val activity: Activity
@@ -85,22 +90,23 @@ class VideoPlayerModule : Module() {
             Property("time")
                 .get { ref: VlcPlayer -> ref.player.time }
                 .set { ref: VlcPlayer, timeInMillis: Long ->
-                    appContext.mainQueue.launch { ref.setTime(timeInMillis) }
+                    ref.setTime(timeInMillis)
                 }
             Property("position")
                 .get { ref: VlcPlayer -> ref.player.position }
                 .set { ref: VlcPlayer, positionPercentage: Float ->
                     appContext.mainQueue.launch { ref.player.position = positionPercentage }
                 }
+            Function("setPosition") { ref: VlcPlayer, position: Position ->
+                appContext.mainQueue.launch {
+                    ref.setPosition(position.position, position.fastSeeking)
+                }
+            }
 
             Property("audioTracks")
                 .get { ref: VlcPlayer ->
-                    (ref.player.getTracks(IMedia.Track.Type.Audio) ?: arrayOf()).map {
-                        Track(
-                            it.id,
-                            it.name
-                        )
-                    }
+                    ref.player.getTracks(IMedia.Track.Type.Audio).orEmpty()
+                        .map { Track(it.id, it.name) }
                 }
             Property("selectedAudioTrackId")
                 .get { ref: VlcPlayer ->
@@ -111,6 +117,9 @@ class VideoPlayerModule : Module() {
                         ref.player.selectTracks(IMedia.Track.Type.Audio, id)
                     }
                 }
+            Function("unselectAudioTrack") { ref: VlcPlayer ->
+                appContext.mainQueue.launch { ref.player.unselectTrackType(IMedia.Track.Type.Audio) }
+            }
 
             Property("selectedTextTrackId")
                 .get { ref: VlcPlayer ->
@@ -123,10 +132,12 @@ class VideoPlayerModule : Module() {
                 }
             Property("textTracks")
                 .get { ref: VlcPlayer ->
-                    (ref.player.getTracks(IMedia.Track.Type.Text) ?: arrayOf()).map {
-                        Track(it.id, it.name)
-                    }
+                    ref.player.getTracks(IMedia.Track.Type.Text).orEmpty()
+                        .map { Track(it.id, it.name) }
                 }
+            Function("unselectTextTrack") { ref: VlcPlayer ->
+                appContext.mainQueue.launch { ref.player.unselectTrackType(IMedia.Track.Type.Text) }
+            }
 
             Property("isPlaying").get { ref: VlcPlayer -> ref.player.isPlaying && ref.player.time != ref.player.length }
             Property("paused")
@@ -140,22 +151,33 @@ class VideoPlayerModule : Module() {
                 appContext.mainQueue.launch { ref.play(source) }
             }
             Function("pause") { ref: VlcPlayer ->
-                appContext.mainQueue.launch { ref.player.pause() }
+                appContext.mainQueue.launch { ref.pause() }
             }
             Function("togglePlay") { ref: VlcPlayer ->
                 appContext.mainQueue.launch {
-                    if (ref.player.isPlaying) ref.player.pause() else ref.player.play()
+                    if (ref.player.isPlaying) ref.pause() else ref.play()
                 }
             }
             Function("stop") { ref: VlcPlayer ->
-                appContext.mainQueue.launch { ref.player.stop() }
+                appContext.mainQueue.launch { ref.stop() }
+            }
+
+            Function("release") { ref: VlcPlayer ->
+                appContext.mainQueue.launch { ref.release() }
             }
 
             Property("audioDelay")
-                .get { ref: VlcPlayer -> ref.player.audioDelay }
+                .get { ref: VlcPlayer -> ref.player.audioDelay / 1000 }
                 .set { ref: VlcPlayer, delayInMillis: Long ->
                     appContext.mainQueue.launch {
-                        ref.player.audioDelay = delayInMillis
+                        ref.player.audioDelay = delayInMillis * 1000
+                    }
+                }
+            Property("textDelay")
+                .get { ref: VlcPlayer -> ref.player.spuDelay / 1000 }
+                .set { ref: VlcPlayer, delayInMillis: Long ->
+                    appContext.mainQueue.launch {
+                        ref.player.spuDelay = delayInMillis * 1000
                     }
                 }
 
@@ -168,13 +190,10 @@ class VideoPlayerModule : Module() {
             Property("progressInfo")
                 .get { ref: VlcPlayer -> ref.progressInfo() }
 
-            Property("title")
-                .get { ref: VlcPlayer -> ref.title }
-                .set { ref: VlcPlayer, title: String ->
-                    appContext.mainQueue.launch {
-                        ref.title = title
-                    }
-                }
+            Property("chapters").get { ref: VlcPlayer ->
+                ref.player.getChapters(-1).orEmpty()
+                    .map { Chapter(it.timeOffset, it.duration, it.name) }
+            }
         }
 
         OnActivityEntersForeground {

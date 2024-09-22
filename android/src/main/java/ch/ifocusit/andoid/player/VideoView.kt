@@ -2,7 +2,11 @@ package ch.ifocusit.andoid.player
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import ch.ifocusit.andoid.player.VideoPlayerModule.ProgressInfo
 import ch.ifocusit.andoid.player.VideoPlayerModule.VideoInfo
 import expo.modules.kotlin.AppContext
@@ -31,10 +35,12 @@ class VideoView(context: Context, appContext: AppContext) : ExpoView(context, ap
             if (field != null) {
                 field?.release()
             }
+            removeAllViews()
             field = value
             if (field != null) {
-                field?.view = this
+                addView(field!!.videoLayout)
                 listenPlayerEvents(field!!)
+                field!!.view = this
             }
         }
 
@@ -61,10 +67,6 @@ class VideoView(context: Context, appContext: AppContext) : ExpoView(context, ap
 
                     Event.EndReached -> {
                         onEnded(Unit)
-                        if (sharedObject.loop) {
-                            player.setTime(0, false)
-                            player.play()
-                        }
                     }
 
                     Event.Playing, Event.Paused, Event.Stopped -> {
@@ -73,19 +75,24 @@ class VideoView(context: Context, appContext: AppContext) : ExpoView(context, ap
                         onPaused(!playing)
                     }
 
-                    Event.TimeChanged -> {
-                        onProgress(ProgressInfo(event.timeChanged, player.position))
-                    }
-
-                    Event.PositionChanged -> {
-                        onProgress(ProgressInfo(player.time, event.positionChanged))
-                    }
-
                     Event.EncounteredError -> {
                         onError(Unit)
                     }
                 }
             }
         }
+        val mainHandler = Handler(Looper.getMainLooper())
+        mainHandler.post(object : Runnable {
+            override fun run() {
+                if (player.isReleased) return
+                if (player.isPlaying) onProgress(ProgressInfo(player.time, player.position))
+                mainHandler.postDelayed(this, 1000)
+            }
+        })
+    }
+
+    override fun onDestroy(owner: LifecycleOwner) {
+        videoPlayer?.release()
+        super.onDestroy(owner)
     }
 }

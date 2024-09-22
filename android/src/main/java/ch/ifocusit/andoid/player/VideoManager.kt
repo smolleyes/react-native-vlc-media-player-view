@@ -1,5 +1,7 @@
 package ch.ifocusit.andoid.player
 
+import android.util.Log
+
 object VideoManager {
     private var videoViews = mutableMapOf<Int, VideoView>()
 
@@ -19,7 +21,7 @@ object VideoManager {
             if (videoView.videoPlayer?.staysActiveInBackground == false &&
                 !videoView.willEnterPiP && !videoView.isInFullscreen
             ) {
-                videoView.videoPlayer?.player?.pause()
+                videoView.videoPlayer?.pause()
             }
         }
     }

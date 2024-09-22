@@ -37,10 +37,16 @@ export declare class VideoPlayer extends SharedObject<VideoPlayerEvents> {
    * The delay between the video and the audio in milliseconds.
    */
   audioDelay: number;
+  /**
+   * The delay between the video and the text in milliseconds.
+   */
+  textDelay: number;
 
   readonly videoInfo: VideoInfo | null;
   readonly progressInfo: ProgressInfo;
   title: string | null;
+
+  chapters: Chapter[];
 
   constructor(config?: PlayerConfiguration);
 
@@ -48,6 +54,15 @@ export declare class VideoPlayer extends SharedObject<VideoPlayerEvents> {
   pause(): void;
   togglePlay(): void;
   stop(): void;
+  /**
+   * This will stop the player and release all resources.
+   * It is recommended to call this method when the player is not needed anymore.
+   * This method will be called automatically when the component is unmounted.
+   */
+  release(): void;
+  unselectAudioTrack(): void;
+  unselectTextTrack(): void;
+  setPosition(value: { position: number; fastSeeking?: boolean });
 }
 export type OnLoadedEvent = { nativeEvent: VideoInfo };
 export type OnProgessEvent = { nativeEvent: ProgressInfo };
@@ -95,5 +110,11 @@ export type VideoSource = {
 
 export type Track = {
   id: string;
+  name: string;
+};
+
+export type Chapter = {
+  timeOffset: number;
+  duration: number;
   name: string;
 };

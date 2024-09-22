@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import { ReactNode, useEffect, useState } from 'react';
-import { StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { LayoutRectangle, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { ProgressInfo, VideoInfo, VideoPlayer } from '../../Player.types';
 import { VideoPlayerEventsObserver, VideoPlayerListener } from '../InternalVideoView';
@@ -12,18 +12,33 @@ type ControlsBarProps = {
   onBack?: () => void;
   onPrevious?: () => void;
   onNext?: () => void;
+  onBackward?: () => void;
+  onForward?: () => void;
+  centerLeftButton?: ReactNode;
   leftButton?: ReactNode;
   rightButton?: ReactNode;
 };
 
 const buttonSize = 40;
 
-export const ControlsBar = ({ player, playerObserver, onBack, onPrevious, onNext, leftButton, rightButton }: ControlsBarProps) => {
+export const ControlsBar = ({
+  player,
+  playerObserver,
+  onBack,
+  onPrevious,
+  onNext,
+  onBackward,
+  onForward,
+  leftButton,
+  rightButton,
+  centerLeftButton
+}: ControlsBarProps) => {
   const title = player.title;
 
   const [paused, setPaused] = useState(player.paused);
   const [progress, setProgress] = useState<ProgressInfo>();
   const [videoInfo, setVideoInfo] = useState<VideoInfo>();
+  const [layout, setLayout] = useState<LayoutRectangle>();
 
   useEffect(() => {
     const listener: VideoPlayerListener = {
@@ -39,85 +54,85 @@ export const ControlsBar = ({ player, playerObserver, onBack, onPrevious, onNext
   }, []);
 
   return (
-    <>
-      <View style={styles.container}>
-        <LinearGradient colors={['rgba(18, 18, 18, 0.8)', 'transparent']} style={styles.top}>
-          {onBack && (
-            <TouchableWithoutFeedback onPress={onBack}>
-              <MaterialIcons name="arrow-back" size={40} color="white" />
-            </TouchableWithoutFeedback>
-          )}
-          {title && (
-            <Text
-              style={{
-                flex: 1,
-                maxHeight: 110,
-                fontSize: 32,
-                fontWeight: 'bold',
-                lineHeight: 60,
-                color: 'white'
-              }}
-            >
-              {title}
-            </Text>
-          )}
-        </LinearGradient>
-        <View style={styles.center}></View>
-        <LinearGradient colors={['transparent', 'rgba(18, 18, 18, 0.9)']} start={{ x: 0, y: 0 }} end={{ x: 0, y: 0.9 }}>
-          {(videoInfo?.seekable && (
-            <View style={styles.progressionBar}>
-              <Text style={{ width: 70, textAlign: 'right', color: 'white' }}>{toTime(progress?.time)}</Text>
-              <Slider
-                style={{ flexShrink: 1, flexGrow: 1 }}
-                thumbTintColor="#ff8c00"
-                minimumTrackTintColor="#ff8c00"
-                maximumTrackTintColor="lightgray"
-                value={progress?.time || 0}
-                onSlidingComplete={time => (player.time = time)}
-                minimumValue={0}
-                maximumValue={videoInfo.duration || 0}
-              />
-              <Text style={{ width: 70, textAlign: 'left', color: 'white' }}>{toTime(videoInfo.duration || 0)}</Text>
-            </View>
-          )) || <Text>{''}</Text>}
-          <View style={styles.bottom}>
-            <View style={styles.part}>{leftButton}</View>
-            <View style={styles.progressControls}>
-              <View style={styles.part}>
-                {onPrevious && (
-                  <TouchableWithoutFeedback onPress={onPrevious}>
-                    <MaterialIcons name="first-page" size={buttonSize} color="white" />
-                  </TouchableWithoutFeedback>
-                )}
-              </View>
-              <View style={styles.part}>
-                <TouchableWithoutFeedback onPress={() => (player.time = player.time - 10 * 1000)}>
-                  <MaterialIcons name="replay-10" size={buttonSize} color="white" />
-                </TouchableWithoutFeedback>
-              </View>
-              <View style={[styles.part, { width: buttonSize * 1.4 }]}>
-                <TouchableWithoutFeedback onPress={() => player.togglePlay()}>
-                  <MaterialIcons name={paused ? 'play-circle-outline' : 'pause-circle-outline'} size={buttonSize * 1.4} color="white" />
-                </TouchableWithoutFeedback>
-              </View>
-              <View style={styles.part}>
-                <TouchableWithoutFeedback onPress={() => (player.time = player.time + 30 * 1000)}>
-                  <MaterialIcons name="forward-30" size={buttonSize} color="white" />
-                </TouchableWithoutFeedback>
-              </View>
-              <View style={styles.part}>
-                {onNext && (
-                  <TouchableWithoutFeedback onPress={onNext}>
-                    <MaterialIcons name="last-page" size={buttonSize} color="white" />
-                  </TouchableWithoutFeedback>
-                )}
-              </View>
-            </View>
-            <View style={styles.part}>{rightButton}</View>
-          </View>
-        </LinearGradient>
+    <View style={styles.container} onLayout={e => setLayout(e.nativeEvent.layout)}>
+      <LinearGradient colors={['rgba(18, 18, 18, 0.8)', 'transparent']} style={styles.top}>
+        {onBack && (
+          <TouchableWithoutFeedback onPress={onBack}>
+            <MaterialIcons name="arrow-back" size={40} color="white" />
+          </TouchableWithoutFeedback>
+        )}
+        {title && (
+          <Text
+            style={{
+              flex: 1,
+              maxHeight: 110,
+              fontSize: 32,
+              fontWeight: '100',
+              lineHeight: 60,
+              color: 'white'
+            }}
+          >
+            {title}
+          </Text>
+        )}
+      </LinearGradient>
+      <View style={styles.center}>
+        <View style={{ height: '100%', paddingTop: 20 }}>{centerLeftButton}</View>
       </View>
-    </>
+      <LinearGradient colors={['transparent', 'rgba(18, 18, 18, 0.9)']} start={{ x: 0, y: 0 }} end={{ x: 0, y: 0.9 }}>
+        {(videoInfo?.seekable && (
+          <View style={styles.progressionBar}>
+            <Text style={{ width: 70, textAlign: 'right', color: 'white' }}>{toTime(progress?.time)}</Text>
+            <Slider
+              style={{ flexShrink: 1, flexGrow: 1 }}
+              thumbTintColor="#ff8c00"
+              minimumTrackTintColor="#ff8c00"
+              maximumTrackTintColor="lightgray"
+              value={progress?.time || 0}
+              onSlidingComplete={time => (player.time = time)}
+              minimumValue={0}
+              maximumValue={videoInfo.duration || 0}
+            />
+            <Text style={{ width: 70, textAlign: 'left', color: 'white' }}>{toTime(videoInfo.duration || 0)}</Text>
+          </View>
+        )) || <Text>{''}</Text>}
+        <View style={[styles.bottom, layout?.width && layout.width < 400 ? { paddingHorizontal: 5 } : {}]}>
+          <View style={styles.part}>{leftButton}</View>
+          <View style={[styles.progressControls, layout?.width && layout.width < 400 ? { gap: 0 } : {}]}>
+            <View style={styles.part}>
+              {onPrevious && (
+                <TouchableWithoutFeedback onPress={onPrevious}>
+                  <MaterialIcons name="first-page" size={buttonSize} color="white" />
+                </TouchableWithoutFeedback>
+              )}
+            </View>
+            <View style={styles.part}>
+              <TouchableWithoutFeedback onPress={onBackward}>
+                <MaterialIcons name="replay-10" size={buttonSize} color="white" />
+              </TouchableWithoutFeedback>
+            </View>
+            <View style={[styles.part, { width: buttonSize * 1.4 }]}>
+              <TouchableWithoutFeedback onPress={() => player.togglePlay()}>
+                <MaterialIcons name={paused ? 'play-circle-outline' : 'pause-circle-outline'} size={buttonSize * 1.4} color="white" />
+              </TouchableWithoutFeedback>
+            </View>
+            <View style={styles.part}>
+              <TouchableWithoutFeedback onPress={onForward}>
+                <MaterialIcons name="forward-30" size={buttonSize} color="white" />
+              </TouchableWithoutFeedback>
+            </View>
+            <View style={styles.part}>
+              {onNext && (
+                <TouchableWithoutFeedback onPress={onNext}>
+                  <MaterialIcons name="last-page" size={buttonSize} color="white" />
+                </TouchableWithoutFeedback>
+              )}
+            </View>
+          </View>
+          <View style={styles.part}>{rightButton}</View>
+        </View>
+      </LinearGradient>
+    </View>
   );
 };
 
@@ -141,8 +156,8 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center'
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start'
   },
   progressionBar: {
     zIndex: 10,
@@ -159,17 +174,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    gap: 10
+    gap: 20
   },
   progressControls: {
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 10
+    gap: 20
   },
   part: {
-    zIndex: 10,
-    width: buttonSize
+    width: buttonSize,
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 });
 
