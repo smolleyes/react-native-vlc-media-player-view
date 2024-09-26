@@ -1,7 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';
 import { StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import { VideoPlayer } from '../../Player.types';
+import { useTimeoutEffect } from './components/useTimeoutEffect';
 
 type DelayViewProps = {
   player: VideoPlayer;
@@ -9,11 +9,7 @@ type DelayViewProps = {
 };
 
 export const AudioDelayView = ({ player, onClose }: DelayViewProps) => {
-  const [delay, setDelay] = useState(player.audioDelay);
-
-  useEffect(() => {
-    player.audioDelay = delay;
-  }, [delay]);
+  const [delay, setDelay] = useTimeoutEffect(player.audioDelay, value => (player.audioDelay = value));
 
   return (
     <View style={styles.container}>
@@ -56,7 +52,7 @@ export const AudioDelayView = ({ player, onClose }: DelayViewProps) => {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    top: 40,
+    top: 80,
     right: 0,
     flex: 1,
     justifyContent: 'center',

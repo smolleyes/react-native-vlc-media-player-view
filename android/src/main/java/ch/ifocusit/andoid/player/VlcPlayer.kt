@@ -11,6 +11,7 @@ import ch.ifocusit.andoid.player.VideoPlayerModule.VideoInfo
 import ch.ifocusit.andoid.player.VideoPlayerModule.VideoSource
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.sharedobjects.SharedObject
+import kotlinx.coroutines.launch
 import org.videolan.libvlc.LibVLC
 import org.videolan.libvlc.Media
 import org.videolan.libvlc.MediaPlayer
@@ -101,10 +102,12 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
         if (player.length == player.time) {
             player.time = 0
         }
-        if (source?.time != null) {
-            player.time = source.time
-        }
         player.play()
+        if (source?.time != null) {
+            appContext?.mainQueue?.launch {
+                setTime(source.time)
+            }
+        }
     }
 
     fun progressInfo(): ProgressInfo {
@@ -114,13 +117,25 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
     fun setTime(timeInMillis: Long) {
         val newValue = timeInMillis.coerceAtMost(player.length).coerceAtLeast(0)
         player.time = newValue
-        view?.onProgress?.invoke(ProgressInfo(newValue, player.position))
+        if (!player.isPlaying) {
+            view?.onProgress?.invoke(ProgressInfo(newValue, player.position))
+        }
+    }
+
+    fun setTimeDelta(delta: Long) {
+        setTime(player.time + delta)
     }
 
     fun setPosition(position: Float, fastSeeking: Boolean) {
         val newValue = (position.coerceAtMost(1f).coerceAtLeast(0f))
         player.setPosition(newValue, fastSeeking)
-        view?.onProgress?.invoke(ProgressInfo(player.time, newValue))
+        if (!player.isPlaying) {
+            view?.onProgress?.invoke(ProgressInfo(player.time, newValue))
+        }
+    }
+
+    fun setPositionDelta(position: Float, fastSeeking: Boolean) {
+        setPosition(player.position + position, fastSeeking)
     }
 
     fun pause() {

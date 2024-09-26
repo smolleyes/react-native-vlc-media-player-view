@@ -62,7 +62,8 @@ export declare class VideoPlayer extends SharedObject<VideoPlayerEvents> {
   release(): void;
   unselectAudioTrack(): void;
   unselectTextTrack(): void;
-  setPosition(value: { position: number; fastSeeking?: boolean });
+  setTimeDelta(delta: number);
+  setPositionDelta(value: { delta: number; fastSeeking?: boolean });
 }
 export type OnLoadedEvent = { nativeEvent: VideoInfo };
 export type OnProgessEvent = { nativeEvent: ProgressInfo };

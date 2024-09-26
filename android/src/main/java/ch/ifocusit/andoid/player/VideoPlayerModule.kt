@@ -10,19 +10,12 @@ import kotlinx.coroutines.launch
 import org.videolan.libvlc.interfaces.IMedia
 
 class VideoPlayerModule : Module() {
-    data class PlayerConfiguration(
-        @Field val initOptions: List<String>
-    ) : Record
 
-    data class VideoSource(
-        @Field val uri: String,
-        @Field val time: Long? = null,
-    ) : Record
+    data class PlayerConfiguration(@Field val initOptions: List<String>) : Record
 
-    data class Dimensions(
-        @Field val width: Int,
-        @Field val height: Int
-    ) : Record
+    data class VideoSource(@Field val uri: String, @Field val time: Long? = null) : Record
+
+    data class Dimensions(@Field val width: Int, @Field val height: Int) : Record
 
     data class VideoInfo(
         @Field val track: Track,
@@ -33,25 +26,14 @@ class VideoPlayerModule : Module() {
         @Field val textTracks: List<Track>
     ) : Record
 
-    data class ProgressInfo(
-        @Field val time: Long,
-        @Field val position: Float
-    ) : Record
+    data class ProgressInfo(@Field val time: Long, @Field val position: Float) : Record
 
-    data class Track(
-        @Field val id: String,
-        @Field val name: String
-    ) : Record
+    data class Track(@Field val id: String, @Field val name: String) : Record
 
-    data class Position(
-        @Field val position: Float,
-        @Field val fastSeeking: Boolean = false
-    ) : Record
+    data class Position(@Field val delta: Float, @Field val fastSeeking: Boolean = false) : Record
 
     data class Chapter(
-        @Field val timeOffset: Long,
-        @Field val duration: Long,
-        @Field val name: String
+        @Field val timeOffset: Long, @Field val duration: Long, @Field val name: String
     ) : Record
 
     private val activity: Activity
@@ -86,20 +68,24 @@ class VideoPlayerModule : Module() {
                     }
                 }
 
-            Property("isSeekable").get { ref: VlcPlayer -> ref.player.isSeekable }
+            Property("isSeekable")
+                .get { ref: VlcPlayer -> ref.player.isSeekable }
             Property("time")
                 .get { ref: VlcPlayer -> ref.player.time }
                 .set { ref: VlcPlayer, timeInMillis: Long ->
                     ref.setTime(timeInMillis)
                 }
+            Function("setTimeDelta") { ref: VlcPlayer, delta: Long ->
+                appContext.mainQueue.launch { ref.setTimeDelta(delta) }
+            }
             Property("position")
                 .get { ref: VlcPlayer -> ref.player.position }
                 .set { ref: VlcPlayer, positionPercentage: Float ->
-                    appContext.mainQueue.launch { ref.player.position = positionPercentage }
+                    appContext.mainQueue.launch { ref.setPosition(positionPercentage, false) }
                 }
-            Function("setPosition") { ref: VlcPlayer, position: Position ->
+            Function("setPositionDelta") { ref: VlcPlayer, position: Position ->
                 appContext.mainQueue.launch {
-                    ref.setPosition(position.position, position.fastSeeking)
+                    ref.setPositionDelta(position.delta, position.fastSeeking)
                 }
             }
 
@@ -139,7 +125,8 @@ class VideoPlayerModule : Module() {
                 appContext.mainQueue.launch { ref.player.unselectTrackType(IMedia.Track.Type.Text) }
             }
 
-            Property("isPlaying").get { ref: VlcPlayer -> ref.player.isPlaying && ref.player.time != ref.player.length }
+            Property("isPlaying")
+                .get { ref: VlcPlayer -> ref.player.isPlaying && ref.player.time != ref.player.length }
             Property("paused")
                 .get { ref: VlcPlayer -> !ref.player.isPlaying }
                 .set { ref: VlcPlayer, paused: Boolean ->

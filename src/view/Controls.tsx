@@ -7,6 +7,7 @@ import { AudioDelayView } from './controls/AudioDelayView';
 import { ControlsBar } from './controls/Bar';
 import useBackHandler from './controls/components/useBackHandler';
 import useBrightness from './controls/components/useBrightness';
+import { useTimeoutEffect } from './controls/components/useTimeoutEffect';
 import useVolume from './controls/components/useVolume';
 import { ControlsGestures } from './controls/Gestures';
 import { TracksView } from './controls/TracksView';
@@ -63,12 +64,17 @@ export const Controls = ({ player, playerObserver, onBack, onPrevious, onNext }:
     };
   }, []);
 
+  const [_, setDelta] = useTimeoutEffect<number>(0, (delta: number) => {
+    player.time = player.time + delta;
+    setDelta(0, false);
+  });
+
   const backward = () => {
-    player.time = player.time - 10 * 1000;
+    setDelta(delta => delta - 10000);
   };
 
   const forward = () => {
-    player.time = player.time + 30 * 1000;
+    setDelta(delta => delta + 30000);
   };
 
   return (
