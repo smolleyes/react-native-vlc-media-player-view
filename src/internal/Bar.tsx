@@ -3,8 +3,8 @@ import Slider from '@react-native-community/slider';
 import { ReactNode, useEffect, useState } from 'react';
 import { LayoutRectangle, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { ProgressInfo, VideoInfo, VideoPlayer } from '../../Player.types';
 import { VideoPlayerEventsObserver, VideoPlayerListener } from '../InternalVideoView';
+import { ProgressInfo, VideoInfo, VideoPlayer } from '../Player.types';
 
 type ControlsBarProps = {
   player: VideoPlayer;
@@ -17,6 +17,8 @@ type ControlsBarProps = {
   centerLeftButton?: ReactNode;
   leftButton?: ReactNode;
   rightButton?: ReactNode;
+  backwardSeconds: number;
+  forwardSeconds: number;
 };
 
 const buttonSize = 40;
@@ -31,7 +33,9 @@ export const ControlsBar = ({
   onForward,
   leftButton,
   rightButton,
-  centerLeftButton
+  centerLeftButton,
+  backwardSeconds,
+  forwardSeconds
 }: ControlsBarProps) => {
   const title = player.title;
 
@@ -52,6 +56,32 @@ export const ControlsBar = ({
       playerObserver.removeEventListener(listener);
     };
   }, []);
+
+  const backwardIcon = (): any => {
+    switch (backwardSeconds) {
+      case 5:
+        return 'replay-5';
+      case 10:
+        return 'replay-10';
+      case 30:
+        return 'replay-30';
+      default:
+        return 'fast-rewind';
+    }
+  };
+
+  const forwardIcon = (): any => {
+    switch (forwardSeconds) {
+      case 5:
+        return 'forward-5';
+      case 10:
+        return 'forward-10';
+      case 30:
+        return 'forward-30';
+      default:
+        return 'fast-forward';
+    }
+  };
 
   return (
     <View style={styles.container} onLayout={e => setLayout(e.nativeEvent.layout)}>
@@ -108,7 +138,7 @@ export const ControlsBar = ({
             </View>
             <View style={styles.part}>
               <TouchableWithoutFeedback onPress={onBackward}>
-                <MaterialIcons name="replay-10" size={buttonSize} color="white" />
+                <MaterialIcons name={backwardIcon()} size={buttonSize} color="white" />
               </TouchableWithoutFeedback>
             </View>
             <View style={[styles.part, { width: buttonSize * 1.4 }]}>
@@ -118,7 +148,7 @@ export const ControlsBar = ({
             </View>
             <View style={styles.part}>
               <TouchableWithoutFeedback onPress={onForward}>
-                <MaterialIcons name="forward-30" size={buttonSize} color="white" />
+                <MaterialIcons name={forwardIcon()} size={buttonSize} color="white" />
               </TouchableWithoutFeedback>
             </View>
             <View style={styles.part}>

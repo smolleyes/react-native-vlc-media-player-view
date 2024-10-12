@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
-import { VideoPlayer } from '../../Player.types';
+import { VideoPlayer } from '../Player.types';
 import { useTimeoutEffect } from './components/useTimeoutEffect';
 
 type DelayViewProps = {

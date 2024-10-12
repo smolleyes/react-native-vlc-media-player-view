@@ -4,4 +4,6 @@ export type VideoViewProps = PlayerViewProps & {
   onBack?: () => void;
   onPrevious?: () => void;
   onNext?: () => void;
+  backwardSeconds?: number;
+  forwardSeconds?: number;
 };

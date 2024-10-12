@@ -1,14 +1,14 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { IconButtonProps } from '@expo/vector-icons/build/createIconSet';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Chapter, useVideoPlayer, VideoPlayer, VideoSource, VideoView } from 'react-native-vlc-media-player-view';
+import { VideoViewRef } from 'react-native-vlc-media-player-view/VideoView';
 
 export default function App() {
   const [source, setSource] = useState<VideoSource>();
 
-  const uri = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+  const uri = 'http://apsmart.in/series/545077210277743/1593574628/136799.mkv';
 
   return (
     <GestureHandlerRootView
@@ -42,6 +42,8 @@ type PlayerProps = {
 };
 
 const Player = ({ onBack, source }: PlayerProps) => {
+  const videoViewRef = useRef<VideoViewRef>();
+
   const player = useVideoPlayer({ initOptions: ['--http-reconnect', '--codec=all', '--avcodec-hw=any'] }, player => {
     player.title = 'Size is adapted to parent layout';
   });
@@ -54,6 +56,7 @@ const Player = ({ onBack, source }: PlayerProps) => {
   return (
     <>
       <VideoView
+        ref={videoViewRef}
         player={player}
         style={{ flex: 1, width: '100%', backgroundColor: '#121212' }}
         onLoaded={() => {
@@ -71,15 +74,18 @@ const Player = ({ onBack, source }: PlayerProps) => {
       />
       {intro && showSkipIntro && (
         <View style={{ position: 'absolute', bottom: 16, right: 16, zIndex: 1000 }}>
-          <MaterialIcons.Button name="skip-next" size={20} onPress={() => (player.time = intro.timeOffset + intro.duration)}>
+          <MaterialIcons.Button
+            name="skip-next"
+            size={20}
+            onPress={() => {
+              videoViewRef.current?.showControlBar(true);
+              player.time = intro.timeOffset + intro.duration;
+            }}
+          >
             Skip Intro
           </MaterialIcons.Button>
         </View>
       )}
     </>
   );
-};
-
-type ButtonProps = Omit<IconButtonProps<string>, 'name'> & {
-  title: string;
 };

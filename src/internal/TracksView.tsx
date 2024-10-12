@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
-import { VideoPlayer } from '../../Player.types';
+import { VideoPlayer } from '../Player.types';
 
 type TracksViewProps = {
   player: VideoPlayer;
