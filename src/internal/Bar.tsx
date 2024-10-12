@@ -3,8 +3,8 @@ import Slider from '@react-native-community/slider';
 import { ReactNode, useEffect, useState } from 'react';
 import { LayoutRectangle, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { VideoPlayerEventsObserver, VideoPlayerListener } from '../InternalVideoView';
 import { ProgressInfo, VideoInfo, VideoPlayer } from '../Player.types';
+import { VideoPlayerEventsObserver, VideoPlayerListener } from '../VideoView';
 
 type ControlsBarProps = {
   player: VideoPlayer;
