@@ -5,10 +5,12 @@ import { LitePlayerView } from 'react-native-vlc-media-player-view';
 export default function App() {
   const [paused, setPaused] = useState(false);
 
+  const uri = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <LitePlayerView
-        source={{ uri: 'http://apsmart.in/movie/545077210277743/1593574628/137851.mkv', time: 3 * 60 * 1000 }}
+        source={{ uri, time: 3 * 60 * 1000 }}
         style={{ width: '80%', height: '80%', backgroundColor: 'black' }}
         paused={paused}
       />
