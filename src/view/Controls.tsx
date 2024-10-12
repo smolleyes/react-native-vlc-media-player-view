@@ -150,16 +150,16 @@ export const Controls = ({ player, playerObserver, onBack, onPrevious, onNext }:
                   </TouchableWithoutFeedback>
                 )
               }
-              rightButton={
-                <TouchableWithoutFeedback
-                  onPress={() => {
-                    setShowControlsBar(false);
-                    setShowTracks(true);
-                  }}
-                >
-                  <MaterialIcons name="keyboard-control" size={30} color="white" />
-                </TouchableWithoutFeedback>
-              }
+              // rightButton={
+              //   <TouchableWithoutFeedback
+              //     onPress={() => {
+              //       setShowControlsBar(false);
+              //       setShowTracks(true);
+              //     }}
+              //   >
+              //     <MaterialIcons name="keyboard-control" size={30} color="white" />
+              //   </TouchableWithoutFeedback>
+              // }
               centerLeftButton={
                 !showAudioDelay && (
                   <TouchableWithoutFeedback

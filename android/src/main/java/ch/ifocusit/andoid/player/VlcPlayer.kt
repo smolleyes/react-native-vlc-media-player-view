@@ -30,8 +30,7 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
     val staysActiveInBackground = false
 
     private val libVLC: LibVLC =
-        if (config?.initOptions != null) LibVLC(context, config.initOptions)
-        else LibVLC(context)
+        if (config?.initOptions != null) LibVLC(context, config.initOptions) else LibVLC(context)
 
     internal val videoLayout = VLCVideoLayout(context)
 
@@ -79,10 +78,14 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
     }
 
     private fun media(uri: String): Media {
-        if (uri.startsWith("http")) {
-            return Media(libVLC, Uri.parse(uri.trim()))
-        }
-        return Media(libVLC, uri.trim())
+        val media =
+            if (uri.startsWith("http"))
+                Media(libVLC, Uri.parse(uri.trim()))
+            else
+                Media(libVLC, uri.trim())
+//        media.addOption(":network-caching=5000");
+//        media.addOption(":codec=ALL");
+        return media
     }
 
     fun release() {

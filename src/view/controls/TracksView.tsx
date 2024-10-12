@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import React from 'react';
+import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import { VideoPlayer } from '../../Player.types';
 
@@ -8,7 +8,10 @@ type TracksViewProps = {
   onClose: () => void;
 };
 
-export const TracksView = ({ player, onClose }: TracksViewProps) => {
+export const TracksView = ({ player, onClose: close }: TracksViewProps) => {
+  const [audioSelected, setAudioSelected] = useState(player.selectedAudioTrackId);
+  const [textSelected, setTextSelected] = useState(player.selectedTextTrackId);
+
   return (
     <View style={styles.background}>
       <View style={styles.container}>
@@ -21,18 +24,15 @@ export const TracksView = ({ player, onClose }: TracksViewProps) => {
                   key={index}
                   onPress={() => {
                     player.selectedAudioTrackId = track.id;
-                    onClose();
+                    setAudioSelected(track.id);
                   }}
                   style={styles.track}
                 >
                   <View style={styles.track}>
                     <View style={{ width: 24 }}>
-                      {track.id === player.selectedAudioTrackId && <Ionicons name="checkmark-sharp" size={24} color="white" />}
+                      {track.id === audioSelected && <Ionicons name="checkmark-sharp" size={24} color="white" />}
                     </View>
-                    <Text
-                      key={'audio' + index}
-                      style={[{ color: 'white' }, track.id !== player.selectedAudioTrackId ? { opacity: 0.5 } : {}]}
-                    >
+                    <Text key={'audio' + index} style={[{ color: 'white' }, track.id !== audioSelected ? { opacity: 0.5 } : {}]}>
                       {track.name}
                     </Text>
                   </View>
@@ -43,23 +43,32 @@ export const TracksView = ({ player, onClose }: TracksViewProps) => {
           <View style={styles.part}>
             <Text style={styles.separation}>Sous-titre</Text>
             <ScrollView contentContainerStyle={styles.tracks}>
-              {player.audioTracks.map((track, index) => (
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  player.unselectTextTrack();
+                  setTextSelected(null);
+                }}
+                style={styles.track}
+              >
+                <View style={styles.track}>
+                  <View style={{ width: 24 }}>{!textSelected && <Ionicons name="checkmark-sharp" size={24} color="white" />}</View>
+                  <Text style={[{ color: 'white' }, textSelected ? { opacity: 0.5 } : {}]}>Aucun</Text>
+                </View>
+              </TouchableWithoutFeedback>
+              {player.textTracks.map((track, index) => (
                 <TouchableWithoutFeedback
                   key={index}
                   onPress={() => {
                     player.selectedTextTrackId = track.id;
-                    onClose();
+                    setTextSelected(track.id);
                   }}
                   style={styles.track}
                 >
                   <View style={styles.track}>
                     <View style={{ width: 24 }}>
-                      {track.id === player.selectedTextTrackId && <Ionicons name="checkmark-sharp" size={24} color="white" />}
+                      {track.id === textSelected && <Ionicons name="checkmark-sharp" size={24} color="white" />}
                     </View>
-                    <Text
-                      key={'text' + index}
-                      style={[{ color: 'white' }, track.id !== player.selectedTextTrackId ? { opacity: 0.5 } : {}]}
-                    >
+                    <Text key={'text' + index} style={[{ color: 'white' }, track.id !== textSelected ? { opacity: 0.5 } : {}]}>
                       {track.name}
                     </Text>
                   </View>
@@ -68,7 +77,7 @@ export const TracksView = ({ player, onClose }: TracksViewProps) => {
             </ScrollView>
           </View>
         </View>
-        <TouchableWithoutFeedback onPress={onClose} style={{ paddingBottom: 10, paddingRight: 20 }}>
+        <TouchableWithoutFeedback onPress={close} style={{ paddingBottom: 10, paddingRight: 20 }}>
           <Text style={{ color: 'white', paddingHorizontal: 30, paddingVertical: 20, paddingTop: 0 }}>Fermer</Text>
         </TouchableWithoutFeedback>
       </View>
