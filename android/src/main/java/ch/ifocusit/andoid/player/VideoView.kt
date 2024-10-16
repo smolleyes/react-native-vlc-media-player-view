@@ -10,11 +10,6 @@ import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.viewevent.EventDispatcher
 import expo.modules.kotlin.views.ExpoView
 import org.videolan.libvlc.MediaPlayer.Event
-import java.lang.Long
-import kotlin.Boolean
-import kotlin.Suppress
-import kotlin.Unit
-import kotlin.run
 
 @Suppress("SameParameterValue")
 @SuppressLint("ViewConstructor")
@@ -31,8 +26,10 @@ class VideoView(context: Context, appContext: AppContext) : ExpoView(context, ap
     private val onPaused by EventDispatcher<Boolean>()
     private val onEnded by EventDispatcher<Unit>()
     private val onError by EventDispatcher<Unit>()
+    internal val onAudioDelayChanged by EventDispatcher<Long>()
+    internal val onTextDelayChanged by EventDispatcher<Long>()
 
-    private var timeChanged = Long.valueOf(0L)
+    private var timeChanged = 0L
         set(value) {
             val seconds = value / 1000
             if (field != seconds && videoPlayer != null) {

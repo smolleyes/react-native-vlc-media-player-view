@@ -43,7 +43,7 @@ class VideoPlayerModule : Module() {
         Name("VideoPlayerModule")
 
         View(VideoView::class) {
-            Events("onLoaded", "onLoading", "onProgress", "onPaused", "onEnded", "onError")
+            Events("onLoaded", "onLoading", "onProgress", "onPaused", "onEnded", "onError", "onAudioDelayChanged", "onTextDelayChanged")
 
             Prop("player") { view: VideoView, player: VlcPlayer ->
                 view.videoPlayer = player
@@ -157,14 +157,14 @@ class VideoPlayerModule : Module() {
                 .get { ref: VlcPlayer -> ref.player.audioDelay / 1000 }
                 .set { ref: VlcPlayer, delayInMillis: Long ->
                     appContext.mainQueue.launch {
-                        ref.player.audioDelay = delayInMillis * 1000
+                        ref.setAudioDelay(delayInMillis)
                     }
                 }
             Property("textDelay")
                 .get { ref: VlcPlayer -> ref.player.spuDelay / 1000 }
                 .set { ref: VlcPlayer, delayInMillis: Long ->
                     appContext.mainQueue.launch {
-                        ref.player.spuDelay = delayInMillis * 1000
+                        ref.setTextDelay(delayInMillis)
                     }
                 }
 

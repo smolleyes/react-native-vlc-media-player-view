@@ -150,4 +150,14 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
         if (player.isReleased) return
         player.stop()
     }
+
+    fun setAudioDelay(delayInMillis: Long) {
+        player.audioDelay = delayInMillis * 1000
+        view?.onAudioDelayChanged?.invoke(delayInMillis)
+    }
+
+    fun setTextDelay(delayInMillis: Long) {
+        player.spuDelay = (delayInMillis * 1000)
+        view?.onTextDelayChanged?.invoke(delayInMillis)
+    }
 }
