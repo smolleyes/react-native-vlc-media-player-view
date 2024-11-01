@@ -1,7 +1,5 @@
 package ch.ifocusit.andoid.player
 
-import android.util.Log
-
 object VideoManager {
     private var videoViews = mutableMapOf<Int, VideoView>()
 

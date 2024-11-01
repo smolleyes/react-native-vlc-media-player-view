@@ -30,12 +30,13 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
     val staysActiveInBackground = false
 
     private val libVLC: LibVLC =
-        if (config?.initOptions != null) LibVLC(context, config.initOptions) else LibVLC(context)
+        if (config?.initOptions != null) LibVLC(context, config.initOptions)
+        else LibVLC(context)
 
     internal val videoLayout = VLCVideoLayout(context)
 
     internal val player: MediaPlayer = MediaPlayer(libVLC).also {
-        it.attachViews(videoLayout, null, false, false)
+        it.attachViews(videoLayout, null, true, true)
         it.videoScale = MediaPlayer.ScaleType.SURFACE_FIT_SCREEN
         it.setAudioOutput("audiotrack")
     }
@@ -48,7 +49,7 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
             field = value
             videoInfo = null
             if (value != null) {
-                val media = media(value.uri)
+                val media = media(value.uri, value.options)
                 player.media = media
                 media.release()
                 if (value.time != null) {
@@ -65,26 +66,24 @@ class VlcPlayer(context: Context, appContext: AppContext, config: PlayerConfigur
         }
         val videoTrack = player.getSelectedTrack(IMedia.Track.Type.Video) as VideoTrack?
         if (videoTrack != null) {
-            this.videoInfo = VideoInfo(
-                videoTrack.let { Track(it.id, it.name) },
+            this.videoInfo = VideoInfo(videoTrack.let { Track(it.id, it.name) },
                 Dimensions(videoTrack.width, videoTrack.height),
                 player.isSeekable,
                 player.length,
                 player.getTracks(IMedia.Track.Type.Audio).orEmpty().map { Track(it.id, it.name) },
-                player.getTracks(IMedia.Track.Type.Text).orEmpty().map { Track(it.id, it.name) }
-            )
+                player.getTracks(IMedia.Track.Type.Text).orEmpty().map { Track(it.id, it.name) })
         }
         return videoInfo
     }
 
-    private fun media(uri: String): Media {
-        val media =
-            if (uri.startsWith("http"))
-                Media(libVLC, Uri.parse(uri.trim()))
-            else
-                Media(libVLC, uri.trim())
-//        media.addOption(":network-caching=5000");
-//        media.addOption(":codec=ALL");
+    private fun media(uri: String, options: List<String>?): Media {
+        val media = if (uri.startsWith("http")) Media(libVLC, Uri.parse(uri.trim()))
+        else Media(libVLC, uri.trim())
+        if (options != null) {
+            for (option in options) {
+                media.addOption(option)
+            }
+        }
         return media
     }
 

@@ -13,7 +13,11 @@ class VideoPlayerModule : Module() {
 
     data class PlayerConfiguration(@Field val initOptions: List<String>) : Record
 
-    data class VideoSource(@Field val uri: String, @Field val time: Long? = null) : Record
+    data class VideoSource(
+        @Field val uri: String,
+        @Field val time: Long? = null,
+        @Field val options: List<String>
+    ) : Record
 
     data class Dimensions(@Field val width: Int, @Field val height: Int) : Record
 
@@ -43,7 +47,16 @@ class VideoPlayerModule : Module() {
         Name("VideoPlayerModule")
 
         View(VideoView::class) {
-            Events("onLoaded", "onLoading", "onProgress", "onPaused", "onEnded", "onError", "onAudioDelayChanged", "onTextDelayChanged")
+            Events(
+                "onLoaded",
+                "onLoading",
+                "onProgress",
+                "onPaused",
+                "onEnded",
+                "onError",
+                "onAudioDelayChanged",
+                "onTextDelayChanged"
+            )
 
             Prop("player") { view: VideoView, player: VlcPlayer ->
                 view.videoPlayer = player

@@ -1,6 +1,6 @@
 {
   "name": "react-native-vlc-media-player-view",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "React Native VLC media player view with full controls",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -31,19 +31,19 @@
   "author": "Julien Boz <julien.boz@gmail.com> (https://github.com/jboz)",
   "license": "MIT",
   "homepage": "https://github.com/jboz/react-native-vlc-media-player-view#readme",
-  "dependencies": {},
   "devDependencies": {
     "@types/react": "^18.0.25",
     "expo-module-scripts": "^3.5.2",
     "expo-modules-core": "^1.12.20"
   },
   "peerDependencies": {
-    "expo": "*",
-    "react": "*",
-    "react-native": "*",
     "@expo/vector-icons": "^14.0.2",
     "@react-native-community/slider": "^4.5.3",
+    "expo": "*",
     "expo-brightness": "^12.0.1",
+    "react": "*",
+    "react-native": "*",
+    "react-native-fullscreen-chz": "^4.0.13",
     "react-native-gesture-handler": "^2.19.0",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-reanimated": "^3.15.1",

@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     height: 40
   },
   bottom: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',

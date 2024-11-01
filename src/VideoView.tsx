@@ -1,14 +1,10 @@
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import { LayoutRectangle, StyleSheet, View } from 'react-native';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { LayoutRectangle, StyleProp, StyleSheet, useWindowDimensions, View, ViewStyle } from 'react-native';
+import FullScreenChz from 'react-native-fullscreen-chz';
 import { getPlayerId, RNPlayer } from './Player';
 import { OnLoadedEvent, OnPausedEvent, OnProgessEvent, ProgressInfo, VideoInfo } from './Player.types';
 import { VideoViewProps } from './VideoView.types';
 import { Controls, ControlsRef } from './internal/Controls';
-
-type LoadingListener = () => void;
-type LoadedListener = (event: VideoInfo) => void;
-type PausedListener = (event: boolean) => void;
-type ProgressListener = (event: ProgressInfo) => void;
 
 export type VideoPlayerEventsObserver = {
   addEventListener: (listener: VideoPlayerListener) => void;
@@ -16,15 +12,21 @@ export type VideoPlayerEventsObserver = {
 };
 
 export type VideoPlayerListener = {
-  onLoading?: LoadingListener;
-  onLoaded?: LoadedListener;
-  onPaused?: PausedListener;
-  onProgress?: ProgressListener;
+  onLoading?: () => void;
+  onLoaded?: (event: VideoInfo) => void;
+  onPaused?: (event: boolean) => void;
+  onProgress?: (event: ProgressInfo) => void;
 };
 
 export type VideoViewRef = {
   showControlBar: (value: boolean) => void;
+  setFullscreen: (value: boolean) => void;
 };
+
+interface ElementDimensions {
+  width: number;
+  height: number;
+}
 
 export const VideoView = forwardRef<VideoViewRef | undefined, VideoViewProps>(
   (
@@ -40,6 +42,7 @@ export const VideoView = forwardRef<VideoViewRef | undefined, VideoViewProps>(
       onNext,
       forwardSeconds = 10,
       backwardSeconds = 10,
+      alwaysFullscreen = false,
       ...rest
     }: VideoViewProps,
     ref
@@ -51,8 +54,18 @@ export const VideoView = forwardRef<VideoViewRef | undefined, VideoViewProps>(
 
     const [videoInfo, setVideoInfo] = useState<VideoInfo>();
     const [progressInfo, setProgressInfo] = useState<ProgressInfo>();
+
+    const [fullscreen, setFullscreen] = useState(alwaysFullscreen);
+
     const [viewLayout, setViewLayout] = useState<LayoutRectangle>();
-    const videoSize = calculateVideoDimensions(viewLayout, videoInfo?.videoSize);
+    const windowsDimensions = useWindowDimensions();
+    let parentDimensions = viewLayout as ElementDimensions;
+    const videoSize = calculateVideoDimensions(parentDimensions, videoInfo?.videoSize);
+    const fullscreenStyle: StyleProp<ViewStyle> = {
+      position: 'absolute',
+      width: '100%',
+      height: '100%'
+    };
 
     const [listeners] = useState<VideoPlayerListener[]>([]);
 
@@ -74,11 +87,22 @@ export const VideoView = forwardRef<VideoViewRef | undefined, VideoViewProps>(
     };
 
     useImperativeHandle(ref, () => ({
-      showControlBar: (value: boolean) => controlRef.current?.showControlBar(value)
+      showControlBar: (value: boolean) => controlRef.current?.showControlBar(value),
+      setFullscreen: (value: boolean) => setFullscreen(value)
     }));
 
+    useEffect(() => {
+      if (fullscreen) {
+        FullScreenChz.enable();
+        parentDimensions = windowsDimensions as ElementDimensions;
+      } else {
+        FullScreenChz.disable();
+        parentDimensions = viewLayout as ElementDimensions;
+      }
+    }, [fullscreen]);
+
     return (
-      <View style={[styles.container, style]} onLayout={e => setViewLayout(e.nativeEvent.layout)}>
+      <View style={[styles.container, style, fullscreen ? fullscreenStyle : {}]} onLayout={e => setViewLayout(e.nativeEvent.layout)}>
         <RNPlayer
           ref={nativeRef}
           player={playerId}
@@ -112,6 +136,9 @@ export const VideoView = forwardRef<VideoViewRef | undefined, VideoViewProps>(
           onNext={onNext}
           backwardSeconds={backwardSeconds}
           forwardSeconds={forwardSeconds}
+          alwaysFullscreen={alwaysFullscreen}
+          fullscreen={fullscreen}
+          onFullscreen={() => setFullscreen(!fullscreen)}
         />
       </View>
     );
@@ -129,12 +156,7 @@ const styles = StyleSheet.create({
   }
 });
 
-interface ElementDimensions {
-  width: number;
-  height: number;
-}
-
-const calculateVideoDimensions = (parentLayout?: LayoutRectangle, videoDimensions?: ElementDimensions | undefined): ElementDimensions => {
+const calculateVideoDimensions = (parentLayout?: ElementDimensions, videoDimensions?: ElementDimensions | undefined): ElementDimensions => {
   'worklet';
   const aspectDimensions = videoDimensions?.height && videoDimensions?.width ? videoDimensions : { width: 16, height: 9 };
   const parentDimensions = parentLayout || { width: 16, height: 9 };

@@ -2,6 +2,7 @@ package ch.ifocusit.andoid.player
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.view.ViewGroup
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import ch.ifocusit.andoid.player.VideoPlayerModule.ProgressInfo
@@ -46,7 +47,11 @@ class VideoView(context: Context, appContext: AppContext) : ExpoView(context, ap
             removeAllViews()
             field = value
             if (field != null) {
-                addView(field!!.videoLayout)
+                addView(
+                    field!!.videoLayout,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
                 listenPlayerEvents(field!!)
                 field!!.view = this
             }

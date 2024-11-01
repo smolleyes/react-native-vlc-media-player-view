@@ -6,11 +6,11 @@ import { VideoPlayer } from '../Player.types';
 import { VideoPlayerEventsObserver, VideoPlayerListener } from '../VideoView';
 import { AudioDelayView } from './AudioDelayView';
 import { ControlsBar } from './Bar';
-import useBackHandler from './components/useBackHandler';
-import useBrightness from './components/useBrightness';
-import { useTimeoutEffect } from './components/useTimeoutEffect';
-import useVolume from './components/useVolume';
 import { ControlsGestures } from './Gestures';
+import useBackHandler from './hooks/useBackHandler';
+import useBrightness from './hooks/useBrightness';
+import { useTimeoutEffect } from './hooks/useTimeoutEffect';
+import useVolume from './hooks/useVolume';
 import { TracksView } from './TracksView';
 import { VerticalControl } from './VerticalControl';
 
@@ -22,6 +22,9 @@ type ControlsProps = {
   onNext?: () => void;
   backwardSeconds: number;
   forwardSeconds: number;
+  alwaysFullscreen: boolean;
+  fullscreen: boolean;
+  onFullscreen?: () => void;
 };
 
 export type ControlsRef = {
@@ -29,7 +32,10 @@ export type ControlsRef = {
 };
 
 export const Controls = forwardRef<ControlsRef | undefined, ControlsProps>(
-  ({ player, playerObserver, onBack, onPrevious, onNext, backwardSeconds, forwardSeconds }, ref) => {
+  (
+    { player, playerObserver, onBack, onPrevious, onNext, backwardSeconds, forwardSeconds, alwaysFullscreen, fullscreen, onFullscreen },
+    ref
+  ) => {
     const [showControlsBar, setShowControlsBar] = useState(false);
 
     const [loading, setLoading] = useState(false);
@@ -168,16 +174,13 @@ export const Controls = forwardRef<ControlsRef | undefined, ControlsProps>(
                     </TouchableWithoutFeedback>
                   )
                 }
-                // rightButton={
-                //   <TouchableWithoutFeedback
-                //     onPress={() => {
-                //       setShowControlsBar(false);
-                //       setShowTracks(true);
-                //     }}
-                //   >
-                //     <MaterialIcons name="keyboard-control" size={30} color="white" />
-                //   </TouchableWithoutFeedback>
-                // }
+                rightButton={
+                  !alwaysFullscreen && (
+                    <TouchableWithoutFeedback onPress={onFullscreen}>
+                      <MaterialIcons name={fullscreen ? 'fullscreen-exit' : 'fullscreen'} size={30} color="white" />
+                    </TouchableWithoutFeedback>
+                  )
+                }
                 centerLeftButton={
                   !showAudioDelay && (
                     <TouchableWithoutFeedback

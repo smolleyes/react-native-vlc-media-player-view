@@ -19,12 +19,12 @@ export default function App() {
         width: '100%',
         height: '100%',
         gap: 20,
-        padding: 10,
+        paddingTop: 10,
         backgroundColor: '#121212'
       }}
     >
       <View style={{ flex: 0, width: '100%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 30 }}>
-        <MaterialIcons.Button onPress={() => setSource({ uri })} name="play-arrow" size={20}>
+        <MaterialIcons.Button onPress={() => setSource({ uri, time: 6000 })} name="play-arrow" size={20}>
           play
         </MaterialIcons.Button>
         <MaterialIcons.Button onPress={() => setSource(undefined)} name="close" size={20}>
@@ -60,9 +60,16 @@ const Player = ({ onBack, source }: PlayerProps) => {
         player={player}
         style={{ flex: 1, width: '100%', backgroundColor: '#121212' }}
         onLoaded={() => {
-          source.time && (player.time = source.time);
+          // source.time && (player.time = source.time);
           setIntro(player.chapters.find(c => c.name.match(/(opening)/i)));
+
+          videoViewRef.current?.setFullscreen(true);
+
+          // player.time = 4 * 60 * 1000 + 49 * 1000;
+          // player.selectedAudioTrackId = player.audioTracks[player.audioTracks.length - 1].id;
+          // player.selectedTextTrackId = player.textTracks[player.textTracks.length - 1].id;
         }}
+        alwaysFullscreen={false}
         onNext={() => console.log('next')}
         onPrevious={() => console.log('previous')}
         onBack={() => onBack(player)}

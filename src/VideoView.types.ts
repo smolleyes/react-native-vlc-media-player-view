@@ -10,4 +10,5 @@ export type VideoViewProps = PlayerViewProps & {
   onTextDelayChanged?: (event: OnDelayChangedEvent) => void;
   backwardSeconds?: number;
   forwardSeconds?: number;
+  alwaysFullscreen?: boolean;
 };
