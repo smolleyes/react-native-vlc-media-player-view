@@ -1,16 +1,21 @@
 package ch.ifocusit.andoid.player
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
+import android.content.pm.ActivityInfo
+import android.util.Log
 import android.view.ViewGroup
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import ch.ifocusit.andoid.player.VideoPlayerModule.ProgressInfo
 import ch.ifocusit.andoid.player.VideoPlayerModule.VideoInfo
+import expo.modules.core.interfaces.Arguments
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.viewevent.EventDispatcher
 import expo.modules.kotlin.views.ExpoView
 import org.videolan.libvlc.MediaPlayer.Event
+
 
 @Suppress("SameParameterValue")
 @SuppressLint("ViewConstructor")

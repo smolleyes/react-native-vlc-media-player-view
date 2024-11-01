@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { LayoutRectangle, StyleProp, StyleSheet, useWindowDimensions, View, ViewStyle } from 'react-native';
 import FullScreenChz from 'react-native-fullscreen-chz';
-import { getPlayerId, RNPlayer } from './Player';
+import { getPlayerId, RNPlayerView } from './Player';
 import { OnLoadedEvent, OnPausedEvent, OnProgessEvent, ProgressInfo, VideoInfo } from './Player.types';
 import { VideoViewProps } from './VideoView.types';
 import { Controls, ControlsRef } from './internal/Controls';
@@ -21,6 +21,8 @@ export type VideoPlayerListener = {
 export type VideoViewRef = {
   showControlBar: (value: boolean) => void;
   setFullscreen: (value: boolean) => void;
+  lockOrientationLandscape: () => void;
+  unlockOrientation: () => void;
 };
 
 interface ElementDimensions {
@@ -36,6 +38,7 @@ export const VideoView = forwardRef<VideoViewRef | undefined, VideoViewProps>(
       onLoaded,
       onPaused,
       onProgress,
+      onFullscreen,
       player,
       onBack,
       onPrevious,
@@ -47,7 +50,7 @@ export const VideoView = forwardRef<VideoViewRef | undefined, VideoViewProps>(
     }: VideoViewProps,
     ref
   ) => {
-    const nativeRef = useRef();
+    const nativeRef = useRef<any>();
     const playerId = getPlayerId(player);
 
     const controlRef = useRef<ControlsRef>();
@@ -88,7 +91,9 @@ export const VideoView = forwardRef<VideoViewRef | undefined, VideoViewProps>(
 
     useImperativeHandle(ref, () => ({
       showControlBar: (value: boolean) => controlRef.current?.showControlBar(value),
-      setFullscreen: (value: boolean) => setFullscreen(value)
+      setFullscreen: (value: boolean) => setFullscreen(value),
+      lockOrientationLandscape: () => nativeRef.current?.lockOrientationLandscape(),
+      unlockOrientation: () => nativeRef.current?.unlockOrientation()
     }));
 
     useEffect(() => {
@@ -99,11 +104,18 @@ export const VideoView = forwardRef<VideoViewRef | undefined, VideoViewProps>(
         FullScreenChz.disable();
         parentDimensions = viewLayout as ElementDimensions;
       }
+      onFullscreen?.(fullscreen);
     }, [fullscreen]);
+
+    useEffect(() => {
+      if (alwaysFullscreen) {
+        nativeRef.current?.lockOrientationLandscape();
+      }
+    }, []);
 
     return (
       <View style={[styles.container, style, fullscreen ? fullscreenStyle : {}]} onLayout={e => setViewLayout(e.nativeEvent.layout)}>
-        <RNPlayer
+        <RNPlayerView
           ref={nativeRef}
           player={playerId}
           style={videoSize}

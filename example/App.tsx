@@ -48,7 +48,7 @@ const Player = ({ onBack, source }: PlayerProps) => {
     player.title = 'Size is adapted to parent layout';
   });
 
-  player.play({ uri: source.uri });
+  player.play(source);
 
   const [showSkipIntro, setShowSkipIntro] = useState(false);
   const [intro, setIntro] = useState<Chapter>();

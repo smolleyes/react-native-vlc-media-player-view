@@ -4,7 +4,7 @@ import { createRef, PureComponent, ReactNode } from 'react';
 import { PlayerConfiguration, PlayerViewProps, VideoPlayer } from './Player.types';
 import { VideoPlayerModule } from './VideoPlayerModule';
 
-export const RNPlayer = requireNativeViewManager<any>('VideoPlayerModule');
+export const RNPlayerView = requireNativeViewManager<any>('VideoPlayerModule');
 
 export function useVideoPlayer(config?: PlayerConfiguration, setup?: (player: VideoPlayer) => void): VideoPlayer {
   return useReleasingSharedObject(() => {
@@ -21,7 +21,7 @@ export class PlayerView extends PureComponent<PlayerViewProps> {
     const { player, ...props } = this.props;
     const playerId = getPlayerId(player);
 
-    return <RNPlayer player={playerId} ref={this.nativeRef} {...props} />;
+    return <RNPlayerView player={playerId} ref={this.nativeRef} {...props} />;
   }
 }
 

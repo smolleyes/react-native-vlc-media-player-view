@@ -81,6 +81,7 @@ export type PlayerViewProps = {
   onPaused?: (paused: OnPausedEvent) => void;
   onEnded?: () => void;
   onError?: () => void;
+  onFullscreen?: (fullscreen: boolean) => void;
 };
 
 export interface VideoInfo {
