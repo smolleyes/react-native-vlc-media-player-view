@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { PlayerViewProps } from './Player.types';
 
 export type OnDelayChangedEvent = { nativeEvent: { payload: number } };
@@ -11,4 +12,6 @@ export type VideoViewProps = PlayerViewProps & {
   backwardSeconds?: number;
   forwardSeconds?: number;
   alwaysFullscreen?: boolean;
+  leftButtons?: ReactNode;
+  rightButtons?: ReactNode;
 };

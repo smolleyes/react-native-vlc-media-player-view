@@ -1,5 +1,5 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, ReactNode, useEffect, useImperativeHandle, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { VideoPlayer } from '../Player.types';
@@ -25,6 +25,8 @@ type ControlsProps = {
   alwaysFullscreen: boolean;
   fullscreen: boolean;
   onFullscreen?: () => void;
+  leftButtons?: ReactNode;
+  rightButtons?: ReactNode;
 };
 
 export type ControlsRef = {
@@ -33,7 +35,20 @@ export type ControlsRef = {
 
 export const Controls = forwardRef<ControlsRef | undefined, ControlsProps>(
   (
-    { player, playerObserver, onBack, onPrevious, onNext, backwardSeconds, forwardSeconds, alwaysFullscreen, fullscreen, onFullscreen },
+    {
+      player,
+      playerObserver,
+      onBack,
+      onPrevious,
+      onNext,
+      backwardSeconds,
+      forwardSeconds,
+      alwaysFullscreen,
+      fullscreen,
+      onFullscreen,
+      leftButtons,
+      rightButtons
+    },
     ref
   ) => {
     const [showControlsBar, setShowControlsBar] = useState(false);

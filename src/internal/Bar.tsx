@@ -16,7 +16,9 @@ type ControlsBarProps = {
   onForward?: () => void;
   centerLeftButton?: ReactNode;
   leftButton?: ReactNode;
+  leftButtons?: ReactNode;
   rightButton?: ReactNode;
+  rightButtons?: ReactNode;
   backwardSeconds: number;
   forwardSeconds: number;
 };
@@ -32,7 +34,9 @@ export const ControlsBar = ({
   onBackward,
   onForward,
   leftButton,
+  leftButtons,
   rightButton,
+  rightButtons,
   centerLeftButton,
   backwardSeconds,
   forwardSeconds
@@ -127,6 +131,7 @@ export const ControlsBar = ({
         )) || <Text>{''}</Text>}
         <View style={[styles.bottom, layout?.width && layout.width < 400 ? { paddingHorizontal: 5 } : {}]}>
           <View style={styles.part}>{leftButton}</View>
+          <View style={styles.part}>{leftButtons}</View>
           <View style={[styles.progressControls, layout?.width && layout.width < 400 ? { gap: 0 } : {}]}>
             <View style={styles.part}>
               {onPrevious && (
@@ -158,6 +163,7 @@ export const ControlsBar = ({
               )}
             </View>
           </View>
+          <View style={styles.part}>{rightButtons}</View>
           <View style={styles.part}>{rightButton}</View>
         </View>
       </LinearGradient>
