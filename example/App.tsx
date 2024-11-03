@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useRef, useState } from 'react';
-import { View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { StatusBar, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Chapter, useVideoPlayer, VideoPlayer, VideoSource, VideoView } from 'react-native-vlc-media-player-view';
 import { VideoViewRef } from 'react-native-vlc-media-player-view/VideoView';
@@ -8,7 +8,12 @@ import { VideoViewRef } from 'react-native-vlc-media-player-view/VideoView';
 export default function App() {
   const [source, setSource] = useState<VideoSource>();
 
-  const uri = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+  const uri = 'http://apsmart.in/movie/545077210277743/1593574628/139769.mkv';
+
+  useEffect(() => {
+    StatusBar.setBackgroundColor('black');
+    StatusBar.setTranslucent(true);
+  }, []);
 
   return (
     <GestureHandlerRootView
@@ -19,11 +24,20 @@ export default function App() {
         width: '100%',
         height: '100%',
         gap: 20,
-        paddingTop: 10,
         backgroundColor: '#121212'
       }}
     >
-      <View style={{ flex: 0, width: '100%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 30 }}>
+      <View
+        style={{
+          flex: 0,
+          width: '100%',
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: 30,
+          paddingTop: 50
+        }}
+      >
         <MaterialIcons.Button onPress={() => setSource({ uri, time: 6000 })} name="play-arrow" size={20}>
           play
         </MaterialIcons.Button>
@@ -69,7 +83,7 @@ const Player = ({ onBack, source }: PlayerProps) => {
           // player.selectedAudioTrackId = player.audioTracks[player.audioTracks.length - 1].id;
           // player.selectedTextTrackId = player.textTracks[player.textTracks.length - 1].id;
         }}
-        alwaysFullscreen={false}
+        alwaysFullscreen={true}
         onNext={() => console.log('next')}
         onPrevious={() => console.log('previous')}
         onBack={() => onBack(player)}
