@@ -98,7 +98,6 @@ export const ControlsBar = ({
               maxHeight: 110,
               fontSize: 32,
               fontWeight: '100',
-              lineHeight: 60,
               color: 'white'
             }}
           >
@@ -177,10 +176,11 @@ const styles = StyleSheet.create({
   top: {
     width: '100%',
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'center',
     paddingHorizontal: 20,
-    gap: 20
+    gap: 20,
+    paddingTop: 10
   },
   center: {
     flex: 1,

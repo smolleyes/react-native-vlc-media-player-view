@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { LayoutRectangle, StyleProp, StyleSheet, useWindowDimensions, View, ViewStyle } from 'react-native';
+import { LayoutRectangle, StyleSheet, useWindowDimensions, View } from 'react-native';
 import FullScreenChz from 'react-native-fullscreen-chz';
 import { getPlayerId, RNPlayerView } from './Player';
 import { OnLoadedEvent, OnPausedEvent, OnProgessEvent, ProgressInfo, VideoInfo } from './Player.types';
@@ -64,11 +64,6 @@ export const VideoView = forwardRef<VideoViewRef | undefined, VideoViewProps>(
     const windowsDimensions = useWindowDimensions();
     let parentDimensions = viewLayout as ElementDimensions;
     const videoSize = calculateVideoDimensions(parentDimensions, videoInfo?.videoSize);
-    const fullscreenStyle: StyleProp<ViewStyle> = {
-      position: 'absolute',
-      width: '100%',
-      height: '100%'
-    };
 
     const [listeners] = useState<VideoPlayerListener[]>([]);
 
@@ -100,21 +95,30 @@ export const VideoView = forwardRef<VideoViewRef | undefined, VideoViewProps>(
       if (fullscreen) {
         FullScreenChz.enable();
         parentDimensions = windowsDimensions as ElementDimensions;
+
+        if (alwaysFullscreen) {
+          nativeRef.current?.lockOrientationLandscape();
+        }
       } else {
         FullScreenChz.disable();
         parentDimensions = viewLayout as ElementDimensions;
+
+        if (alwaysFullscreen) {
+          nativeRef.current?.unlockOrientation();
+        }
       }
       onFullscreen?.(fullscreen);
+
+      return () => {
+        FullScreenChz.disable();
+      };
     }, [fullscreen]);
 
-    useEffect(() => {
-      if (alwaysFullscreen) {
-        nativeRef.current?.lockOrientationLandscape();
-      }
-    }, []);
-
     return (
-      <View style={[styles.container, style, fullscreen ? fullscreenStyle : {}]} onLayout={e => setViewLayout(e.nativeEvent.layout)}>
+      <View
+        style={[styles.container, style, fullscreen ? { ...styles.fullscreen } : {}]}
+        onLayout={e => setViewLayout(e.nativeEvent.layout)}
+      >
         <RNPlayerView
           ref={nativeRef}
           player={playerId}
@@ -162,9 +166,18 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     height: '100%',
-    backgroundColor: '#121212',
+    backgroundColor: 'black',
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  fullscreen: {
+    position: 'absolute',
+    flex: 1,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'black',
+    padding: 0,
+    margin: 0
   }
 });
 

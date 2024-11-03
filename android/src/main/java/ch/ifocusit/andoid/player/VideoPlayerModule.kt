@@ -2,7 +2,6 @@ package ch.ifocusit.andoid.player
 
 import android.app.Activity
 import android.content.pm.ActivityInfo
-import android.util.Log
 import expo.modules.kotlin.exception.Exceptions
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
@@ -64,15 +63,13 @@ class VideoPlayerModule : Module() {
                 view.videoPlayer = player
             }
 
-            AsyncFunction("lockOrientationLandscape") { view: VideoView ->
-                appContext.mainQueue.launch {
-                    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                }
+            AsyncFunction("lockOrientationLandscape") {
+                activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                true
             }
-            AsyncFunction("unlockOrientation") { view: VideoView ->
-                appContext.mainQueue.launch {
-                    activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-                }
+            AsyncFunction("unlockOrientation") {
+                activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                true
             }
 
             OnViewDestroys { view: VideoView ->
