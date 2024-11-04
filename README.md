@@ -38,7 +38,7 @@ export default function App() {
 }
 ```
 
-More on [example application](<[VideoView.types.ts](https://github.com/jboz/react-native-vlc-media-player-view/blob/main/example/App.tsx)>)
+To who more: [example application](<[VideoView.types.ts](https://github.com/jboz/react-native-vlc-media-player-view/blob/main/example/App.tsx)>)
 
 ## Usage
 
