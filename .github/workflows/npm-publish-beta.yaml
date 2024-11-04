@@ -29,7 +29,7 @@ jobs:
       - name: Update version to beta
         run: |
           npm version prerelease --preid=beta -m "Upgrade to %s"
-          git push origin main
+          git push
       - run: npm publish --tag beta --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
