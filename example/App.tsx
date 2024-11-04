@@ -8,7 +8,7 @@ import { VideoViewRef } from 'react-native-vlc-media-player-view/VideoView';
 export default function App() {
   const [source, setSource] = useState<VideoSource>();
 
-  const uri = 'http://apsmart.in/movie/545077210277743/1593574628/139769.mkv';
+  const uri = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
 
   useEffect(() => {
     StatusBar.setBackgroundColor('black');
