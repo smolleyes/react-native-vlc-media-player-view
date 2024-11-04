@@ -1,6 +1,6 @@
 # react-native-vlc-media-player-view
 
-![NPM Version](https://img.shields.io/npm/v/react-native-vlc-media-player-view)
+[![NPM Version](https://img.shields.io/npm/v/react-native-vlc-media-player-view)](https://www.npmjs.com/package/react-native-vlc-media-player-view)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 React Native VLC media player view with full controls.
@@ -20,6 +20,8 @@ dependencies {
 ```sh
 npm install react-native-vlc-media-player-view
 ```
+
+Take a look at the peer dependencies defined in the [package.json](https://github.com/jboz/react-native-vlc-media-player-view/blob/main/package.json).
 
 ## Example
 

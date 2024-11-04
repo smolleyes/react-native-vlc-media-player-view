@@ -1,0 +1,31 @@
+name: Node.js Package
+
+on:
+  # Trigger the workflow on push or pull request, but only for the master branch
+  push:
+    branches:
+      - main
+jobs:
+  publish-npm:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
+      - name: Set up Git user information
+        run: |
+          git config --global user.name 'GIT Package Updater'
+          git config --global user.email 'julienboz@noreply.github.com'
+      - name: Update version
+        run: |
+          npm version patch -m "Upgrade to %s"
+          git push origin main
+      - run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
