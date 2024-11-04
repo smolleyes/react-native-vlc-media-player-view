@@ -59,7 +59,7 @@ const Player = ({ onBack, source }: PlayerProps) => {
   const videoViewRef = useRef<VideoViewRef>();
 
   const player = useVideoPlayer({ initOptions: ['--http-reconnect', '--codec=all', '--avcodec-hw=any'] }, player => {
-    player.title = 'Size is adapted to parent layout';
+    player.title = 'Big Buck Bunny';
   });
 
   player.play(source);
@@ -77,13 +77,17 @@ const Player = ({ onBack, source }: PlayerProps) => {
           // source.time && (player.time = source.time);
           setIntro(player.chapters.find(c => c.name.match(/(opening)/i)));
 
-          videoViewRef.current?.setFullscreen(true);
+          // set fullscreen programmatically
+          // videoViewRef.current?.setFullscreen(true);
 
+          // set time manually
           // player.time = 4 * 60 * 1000 + 49 * 1000;
+
+          // change audio audio/subtitles tracks
           // player.selectedAudioTrackId = player.audioTracks[player.audioTracks.length - 1].id;
           // player.selectedTextTrackId = player.textTracks[player.textTracks.length - 1].id;
         }}
-        alwaysFullscreen={true}
+        alwaysFullscreen={false}
         onNext={() => console.log('next')}
         onPrevious={() => console.log('previous')}
         onBack={() => onBack(player)}
