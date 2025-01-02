@@ -1,11 +1,11 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { forwardRef, ReactNode, useEffect, useImperativeHandle, useState } from 'react';
+import React, { forwardRef, ReactNode, useEffect, useImperativeHandle, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { VideoPlayer } from '../Player.types';
 import { VideoPlayerEventsObserver, VideoPlayerListener } from '../VideoView';
 import { AudioDelayView } from './AudioDelayView';
 import { ControlsBar } from './Bar';
+import { Focussable } from './components/Focussable';
 import { ControlsGestures } from './Gestures';
 import useBackHandler from './hooks/useBackHandler';
 import useBrightness from './hooks/useBrightness';
@@ -31,6 +31,7 @@ type ControlsProps = {
 
 export type ControlsRef = {
   showControlBar: (value: boolean) => void;
+  isControlBarVisible: boolean;
 };
 
 export const Controls = forwardRef<ControlsRef | undefined, ControlsProps>(
@@ -65,7 +66,8 @@ export const Controls = forwardRef<ControlsRef | undefined, ControlsProps>(
     const [showAudioDelay, setShowAudioDelay] = useState(false);
 
     useImperativeHandle(ref, () => ({
-      showControlBar: setShowControlsBar
+      showControlBar: setShowControlsBar,
+      isControlBarVisible: showControlsBar
     }));
 
     useBackHandler(() => {
@@ -75,14 +77,6 @@ export const Controls = forwardRef<ControlsRef | undefined, ControlsProps>(
       }
       return;
     });
-
-    // useTVEventHandler(event => {
-    //   if (!showControlsBar) {
-    //     event.eventType === 'left' && onBackward && onBackward();
-    //     event.eventType === 'right' && onForward && onForward();
-    //     (event.eventType === 'down' || event.eventType === 'up') && setShowControlsBar(true);
-    //   }
-    // });
 
     useEffect(() => {
       const listener: VideoPlayerListener = {
@@ -178,7 +172,7 @@ export const Controls = forwardRef<ControlsRef | undefined, ControlsProps>(
                 forwardSeconds={forwardSeconds}
                 leftButton={
                   (player.audioTracks.length > 0 || player.textTracks.length > 1) && (
-                    <TouchableWithoutFeedback
+                    <Focussable
                       onPress={() => {
                         setShowAudioDelay(false);
                         setShowControlsBar(false);
@@ -186,19 +180,19 @@ export const Controls = forwardRef<ControlsRef | undefined, ControlsProps>(
                       }}
                     >
                       <MaterialIcons name="subtitles" size={30} color="white" />
-                    </TouchableWithoutFeedback>
+                    </Focussable>
                   )
                 }
                 rightButton={
                   !alwaysFullscreen && (
-                    <TouchableWithoutFeedback onPress={onFullscreen}>
+                    <Focussable onPress={onFullscreen}>
                       <MaterialIcons name={fullscreen ? 'fullscreen-exit' : 'fullscreen'} size={30} color="white" />
-                    </TouchableWithoutFeedback>
+                    </Focussable>
                   )
                 }
                 centerLeftButton={
                   !showAudioDelay && (
-                    <TouchableWithoutFeedback
+                    <Focussable
                       onPress={() => {
                         setShowAudioDelay(true);
                       }}
@@ -214,7 +208,7 @@ export const Controls = forwardRef<ControlsRef | undefined, ControlsProps>(
                     >
                       <MaterialIcons name="volume-up" size={25} color="white" />
                       <Text style={{ color: 'white', fontSize: 16, fontWeight: '300' }}>{player.audioDelay} ms</Text>
-                    </TouchableWithoutFeedback>
+                    </Focussable>
                   )
                 }
               />

@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { VideoPlayer } from '../Player.types';
+import { Focussable } from './components/Focussable';
 
 type TracksViewProps = {
   player: VideoPlayer;
@@ -20,7 +21,7 @@ export const TracksView = ({ player, onClose: close }: TracksViewProps) => {
             <Text style={styles.separation}>Audio</Text>
             <ScrollView contentContainerStyle={styles.tracks}>
               {player.audioTracks.map((track, index) => (
-                <TouchableWithoutFeedback
+                <Focussable
                   key={index}
                   onPress={() => {
                     player.selectedAudioTrackId = track.id;
@@ -36,14 +37,14 @@ export const TracksView = ({ player, onClose: close }: TracksViewProps) => {
                       {track.name}
                     </Text>
                   </View>
-                </TouchableWithoutFeedback>
+                </Focussable>
               ))}
             </ScrollView>
           </View>
           <View style={styles.part}>
             <Text style={styles.separation}>Sous-titre</Text>
             <ScrollView contentContainerStyle={styles.tracks}>
-              <TouchableWithoutFeedback
+              <Focussable
                 onPress={() => {
                   player.unselectTextTrack();
                   setTextSelected(null);
@@ -54,9 +55,9 @@ export const TracksView = ({ player, onClose: close }: TracksViewProps) => {
                   <View style={{ width: 24 }}>{!textSelected && <Ionicons name="checkmark-sharp" size={24} color="white" />}</View>
                   <Text style={[{ color: 'white' }, textSelected ? { opacity: 0.5 } : {}]}>Aucun</Text>
                 </View>
-              </TouchableWithoutFeedback>
+              </Focussable>
               {player.textTracks.map((track, index) => (
-                <TouchableWithoutFeedback
+                <Focussable
                   key={index}
                   onPress={() => {
                     player.selectedTextTrackId = track.id;
@@ -72,14 +73,14 @@ export const TracksView = ({ player, onClose: close }: TracksViewProps) => {
                       {track.name}
                     </Text>
                   </View>
-                </TouchableWithoutFeedback>
+                </Focussable>
               ))}
             </ScrollView>
           </View>
         </View>
-        <TouchableWithoutFeedback onPress={close} style={{ paddingBottom: 10, paddingRight: 20 }}>
+        <Focussable onPress={close} style={{ paddingBottom: 10, paddingRight: 20 }}>
           <Text style={{ color: 'white', paddingHorizontal: 30, paddingVertical: 20, paddingTop: 0 }}>Fermer</Text>
-        </TouchableWithoutFeedback>
+        </Focussable>
       </View>
     </View>
   );

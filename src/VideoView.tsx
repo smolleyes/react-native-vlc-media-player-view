@@ -20,6 +20,7 @@ export type VideoPlayerListener = {
 
 export type VideoViewRef = {
   showControlBar: (value: boolean) => void;
+  isControlBarVisible: boolean;
   setFullscreen: (value: boolean) => void;
   lockOrientationLandscape: () => void;
   unlockOrientation: () => void;
@@ -88,6 +89,7 @@ export const VideoView = forwardRef<VideoViewRef | undefined, VideoViewProps>(
 
     useImperativeHandle(ref, () => ({
       showControlBar: (value: boolean) => controlRef.current?.showControlBar(value),
+      isControlBarVisible: controlRef.current?.isControlBarVisible || false,
       setFullscreen: (value: boolean) => setFullscreen(value),
       lockOrientationLandscape: () => nativeRef.current?.lockOrientationLandscape(),
       unlockOrientation: () => nativeRef.current?.unlockOrientation()

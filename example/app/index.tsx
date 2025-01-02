@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useEffect, useRef, useState } from 'react';
-import { StatusBar, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Pressable, StatusBar, StyleSheet, Text, TVEventHandler, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Chapter, useVideoPlayer, VideoPlayer, VideoSource, VideoView } from 'react-native-vlc-media-player-view';
 import { VideoViewRef } from 'react-native-vlc-media-player-view/VideoView';
@@ -10,40 +10,37 @@ export default function App() {
 
   const uri = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
 
+  const appStyles = useAppStyles();
+  const buttons = useButtonStyles();
+
   useEffect(() => {
     StatusBar.setBackgroundColor('black');
     StatusBar.setTranslucent(true);
   }, []);
 
   return (
-    <GestureHandlerRootView
-      style={{
-        flex: 1,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: '100%',
-        height: '100%',
-        gap: 20,
-        backgroundColor: '#121212'
-      }}
-    >
-      <View
-        style={{
-          flex: 0,
-          width: '100%',
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: 30,
-          paddingTop: 50
-        }}
-      >
-        <MaterialIcons.Button onPress={() => setSource({ uri, time: 6000 })} name="play-arrow" size={20}>
-          play
-        </MaterialIcons.Button>
-        <MaterialIcons.Button onPress={() => setSource(undefined)} name="close" size={20}>
-          close
-        </MaterialIcons.Button>
+    <GestureHandlerRootView style={appStyles.container}>
+      <View style={appStyles.content}>
+        <Pressable
+          onPress={() => setSource({ uri, time: 6000 })}
+          style={({ focused }) => ({
+            ...buttons.default,
+            backgroundColor: focused ? '#FF79C1' : '#555'
+          })}
+        >
+          <MaterialIcons name="play-arrow" size={20} color={'white'} />
+          <Text style={buttons.text}>play</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => setSource(undefined)}
+          style={({ focused }) => ({
+            ...buttons.default,
+            backgroundColor: focused ? '#FF79C1' : '#555'
+          })}
+        >
+          <Text style={buttons.text}>close</Text>
+          <MaterialIcons name="close" size={20} color={'white'} />
+        </Pressable>
       </View>
       {source && <Player source={source} onBack={() => setSource(undefined)} />}
     </GestureHandlerRootView>
@@ -66,6 +63,14 @@ const Player = ({ onBack, source }: PlayerProps) => {
 
   const [showSkipIntro, setShowSkipIntro] = useState(false);
   const [intro, setIntro] = useState<Chapter>();
+
+  useEffect(() => {
+    TVEventHandler.addListener(event => {
+      if (event.eventType === 'bottom' && !videoViewRef.current?.isControlBarVisible) {
+        videoViewRef.current?.showControlBar(true);
+      }
+    });
+  }, []);
 
   return (
     <>
@@ -113,4 +118,44 @@ const Player = ({ onBack, source }: PlayerProps) => {
       )}
     </>
   );
+};
+
+const useAppStyles = function () {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      width: '100%',
+      height: '100%',
+      gap: 20,
+      backgroundColor: '#121212'
+    },
+    content: {
+      flex: 0,
+      width: '100%',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      gap: 30,
+      paddingTop: 50
+    }
+  });
+};
+
+const useButtonStyles = function () {
+  return StyleSheet.create({
+    default: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#44475A',
+      borderRadius: 5,
+      paddingVertical: 10,
+      paddingHorizontal: 20,
+      gap: 5
+    },
+    text: { color: 'white' },
+    focused: { backgroundColor: '#FF79C5' }
+  });
 };

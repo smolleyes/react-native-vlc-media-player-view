@@ -1,10 +1,11 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import { ReactNode, useEffect, useState } from 'react';
-import { LayoutRectangle, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { LayoutRectangle, StyleSheet, Text, View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { ProgressInfo, VideoInfo, VideoPlayer } from '../Player.types';
 import { VideoPlayerEventsObserver, VideoPlayerListener } from '../VideoView';
+import { Focussable } from './components/Focussable';
 
 type ControlsBarProps = {
   player: VideoPlayer;
@@ -91,9 +92,9 @@ export const ControlsBar = ({
     <View style={styles.container} onLayout={e => setLayout(e.nativeEvent.layout)}>
       <LinearGradient colors={['rgba(18, 18, 18, 0.8)', 'transparent']} style={styles.top}>
         {onBack && (
-          <TouchableWithoutFeedback onPress={onBack}>
+          <Focussable onPress={onBack}>
             <MaterialIcons name="arrow-back" size={40} color="white" />
-          </TouchableWithoutFeedback>
+          </Focussable>
         )}
         {title && (
           <Text
@@ -135,31 +136,31 @@ export const ControlsBar = ({
           <View style={[styles.progressControls, layout?.width && layout.width < 400 ? { gap: 0 } : {}]}>
             <View style={styles.part}>
               {onPrevious && (
-                <TouchableWithoutFeedback onPress={onPrevious}>
+                <Focussable onPress={onPrevious}>
                   <MaterialIcons name="first-page" size={buttonSize} color="white" />
-                </TouchableWithoutFeedback>
+                </Focussable>
               )}
             </View>
             <View style={styles.part}>
-              <TouchableWithoutFeedback onPress={onBackward}>
+              <Focussable onPress={onBackward}>
                 <MaterialIcons name={backwardIcon()} size={buttonSize} color="white" />
-              </TouchableWithoutFeedback>
+              </Focussable>
             </View>
             <View style={[styles.part, { width: buttonSize * 1.4 }]}>
-              <TouchableWithoutFeedback onPress={() => player.togglePlay()}>
+              <Focussable onPress={() => player.togglePlay()}>
                 <MaterialIcons name={paused ? 'play-circle-outline' : 'pause-circle-outline'} size={buttonSize * 1.4} color="white" />
-              </TouchableWithoutFeedback>
+              </Focussable>
             </View>
             <View style={styles.part}>
-              <TouchableWithoutFeedback onPress={onForward}>
+              <Focussable onPress={onForward}>
                 <MaterialIcons name={forwardIcon()} size={buttonSize} color="white" />
-              </TouchableWithoutFeedback>
+              </Focussable>
             </View>
             <View style={styles.part}>
               {onNext && (
-                <TouchableWithoutFeedback onPress={onNext}>
+                <Focussable onPress={onNext}>
                   <MaterialIcons name="last-page" size={buttonSize} color="white" />
-                </TouchableWithoutFeedback>
+                </Focussable>
               )}
             </View>
           </View>

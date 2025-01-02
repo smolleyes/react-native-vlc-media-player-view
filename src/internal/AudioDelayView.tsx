@@ -1,6 +1,7 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { VideoPlayer } from '../Player.types';
+import { Focussable } from './components/Focussable';
 import { useTimeoutEffect } from './hooks/useTimeoutEffect';
 
 type DelayViewProps = {
@@ -15,21 +16,21 @@ export const AudioDelayView = ({ player, onClose }: DelayViewProps) => {
     <View style={styles.container}>
       <View style={styles.part}>
         <Text style={{ color: '#ff8c00', fontSize: 14, flex: 1, textAlign: 'center', fontWeight: 'bold' }}>Décalage audio</Text>
-        <TouchableWithoutFeedback onPress={onClose}>
+        <Focussable onPress={onClose}>
           <MaterialIcons name="close" size={30} color="white" style={{ paddingHorizontal: 10 }} />
-        </TouchableWithoutFeedback>
+        </Focussable>
       </View>
       <View style={[styles.part, { justifyContent: 'space-around', paddingVertical: 10 }]}>
-        <TouchableWithoutFeedback onPress={() => setDelay(delay => delay - 50)}>
+        <Focussable onPress={() => setDelay(delay => delay - 50)}>
           <MaterialIcons name="arrow-back-ios-new" size={25} color="white" style={{ paddingHorizontal: 20 }} />
-        </TouchableWithoutFeedback>
+        </Focussable>
         <Text style={{ color: 'white', fontSize: 20 }}>{delay} ms</Text>
-        <TouchableWithoutFeedback onPress={() => setDelay(delay => delay + 50)}>
+        <Focussable onPress={() => setDelay(delay => delay + 50)}>
           <MaterialIcons name="arrow-forward-ios" size={30} color="white" style={{ paddingHorizontal: 20 }} />
-        </TouchableWithoutFeedback>
+        </Focussable>
       </View>
       <View style={styles.part}>
-        <TouchableWithoutFeedback onPress={() => setDelay(0)}>
+        <Focussable onPress={() => setDelay(0)}>
           <Text
             style={{
               color: 'white',
@@ -43,7 +44,7 @@ export const AudioDelayView = ({ player, onClose }: DelayViewProps) => {
           >
             Réinitialiser
           </Text>
-        </TouchableWithoutFeedback>
+        </Focussable>
       </View>
     </View>
   );
