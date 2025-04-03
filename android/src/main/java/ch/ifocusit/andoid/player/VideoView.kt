@@ -45,10 +45,9 @@ class VideoView(context: Context, appContext: AppContext) : ExpoView(context, ap
         }
 
     var videoPlayer: VlcPlayer? = null
-        set(value) {
-            if (field != null) {
-                field?.release()
-            }
+    set(value) {
+        if (field !== value) {
+            field?.release()
             removeAllViews()
             field = value
             if (field != null) {
@@ -61,6 +60,7 @@ class VideoView(context: Context, appContext: AppContext) : ExpoView(context, ap
                 field!!.view = this
             }
         }
+    }
 
     init {
         VideoManager.registerVideoView(this)
